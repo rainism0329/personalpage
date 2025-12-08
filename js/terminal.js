@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
             cmd_hack: "向游戏模块注入作弊码",
             cmd_clear: "清除屏幕",
             cmd_exit: "关闭会话",
-            info_name: "姓名: 张明哲 (Phil)",
-            info_role: "职位: 首席软件工程师 (Lead)",
+            info_name: "姓名: Phil Zhang",
+            info_role: "职位: 资深软件工程师 (Lead)",
             hack_success: ">> 注入成功。无敌模式已开启 (God Mode)。",
             hack_fail: ">> 错误: 游戏模块未运行。",
             err_cmd: "未找到命令:"
