@@ -767,3 +767,34 @@ footer { text-align: center; padding: 80px 0 50px 0; color: #888; background: #0
     #ai-widget-container { bottom: 20px; right: 20px; }
     #ai-chat-window { width: 300px; height: 450px; bottom: 70px; }
 }
+
+/* ========== 移动端防溢出补丁 (Mobile Overflow Fix) ========== */
+
+/* 1. 强制限制根元素宽度 */
+html, body {
+    max-width: 100vw;       /* 最大宽度不超过视口 */
+    overflow-x: hidden;     /* 隐藏水平溢出 */
+    width: 100%;            /* 宽度锁定 */
+    position: relative;     /* 辅助定位 */
+}
+
+/* 2. 修复 AOS 动画可能导致的撑开 */
+/* 当元素从屏幕右侧飞入时，可能会短暂撑开页面 */
+section {
+    overflow-x: hidden;
+}
+
+/* 3. 修复 AI 窗口在极小屏幕上的宽度问题 */
+@media (max-width: 400px) {
+    #ai-chat-window {
+        width: 90vw !important; /* 强制不超过视口宽度的 90% */
+        right: 5vw !important;  /* 居中摆放 */
+        bottom: 80px;
+    }
+}
+
+/* 4. 修复移动端导航栏溢出 */
+/* 确保侧边栏在隐藏时不会产生可滚动的空白区域 */
+.nav-links {
+    max-width: 100vw;
+}
