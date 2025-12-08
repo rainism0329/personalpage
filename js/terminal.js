@@ -1,6 +1,6 @@
 /**
  * Terminal Logic v2.0
- * Features: I18n, Game Cheats, Typing SFX
+ * Features: I18n, Game Cheats, Typing SFX, Updated Profile
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cmd_clear: "Clear terminal history",
             cmd_exit: "Close session",
             info_name: "Name: Mingzhe (Phil) Zhang",
-            info_role: "Role: Lead Software Engineer",
+            info_role: "Role: Lead Software Engineer", // English keeps Lead
             hack_success: ">> INJECTION SUCCESSFUL. GOD MODE ENABLED.",
             hack_fail: ">> ERROR: Game module not running.",
             err_cmd: "Command not found:"
@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
             cmd_hack: "向游戏模块注入作弊码",
             cmd_clear: "清除屏幕",
             cmd_exit: "关闭会话",
-            info_name: "姓名: Phil Zhang",
+            info_name: "姓名: 张明哲 (Phil)",
+            // [修改点] 中文改为资深
             info_role: "职位: 资深软件工程师 (Lead)",
             hack_success: ">> 注入成功。无敌模式已开启 (God Mode)。",
             hack_fail: ">> 错误: 游戏模块未运行。",
@@ -60,9 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = '';
             setTimeout(() => input.focus(), 100);
 
-            // 每次打开显示欢迎语
             const t = termData[getLang()];
-            // content.innerHTML = ''; // 可选：每次清空
             print(t.welcome, "res-info");
             print(t.help_desc);
         } else {
@@ -86,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cmd) processCommand(cmd);
             input.value = '';
             setTimeout(() => content.scrollTop = content.scrollHeight, 10);
-            playTypingSound(); // 播放回车音效
+            playTypingSound();
         }
     });
 
@@ -100,12 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function processCommand(rawCmd) {
         print(`<span style="color:#50fa7b">root@phil:~$</span> ${rawCmd}`);
         const cmd = rawCmd.toLowerCase();
-        const t = termData[getLang()]; // 获取当前语言文本
+        const t = termData[getLang()];
 
-        // 简单的打字音效模拟
         playTypingSound();
 
-        // 基础命令解析
         if (cmd === 'help') {
             print(t.help_list);
             print(`&nbsp; - <span class='cmd-highlight'>whoami</span>   : ${t.cmd_whoami}`);
@@ -124,9 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (cmd === 'projects') {
-            // 项目列表保持双语或者通用英文即可，这里演示通用
-            print("1. Next-Gen Trading Platform [Lead Arch]", "res-info");
+            // [修改点] 项目列表更新
+            print("1. Credit Risk Management System [Lead Arch]", "res-info");
+            print("&nbsp;&nbsp; -> Real-time counterparty exposure & stress testing.", "res-info");
             print("2. AutoWatch Plus (Citi) [Java/Spring]", "res-info");
+            print("3. Unified Data Platform [Guice/Groovy]", "res-info");
             return;
         }
 
@@ -138,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cmd === 'clear') { content.innerHTML = ''; return; }
         if (cmd === 'exit') { toggleTerminal(); return; }
 
-        // --- 联动功能：重启页面 ---
         if (cmd === 'reboot' || cmd === 'sudo reboot') {
             print("SYSTEM REBOOT INITIATED...", "res-warn");
             document.body.style.transition = "opacity 1s";
@@ -147,11 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // ... 在 processCommand 函数内部 ...
-
-        // --- 联动功能：黑入游戏 ---
         if (cmd.includes('hack game')) {
-            // 1. 开启无敌
             if (cmd.includes('--god')) {
                 if (window.gameInstance) {
                     window.gameInstance.enableGodMode();
@@ -160,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     print(t.hack_fail, "res-error");
                 }
             }
-            // 2. [新增] 关闭无敌
             else if (cmd.includes('--off') || cmd.includes('--clear')) {
                 if (window.gameInstance) {
                     window.gameInstance.disableGodMode();
@@ -170,14 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     print(t.hack_fail, "res-error");
                 }
             }
-            // 3. 提示用法
             else {
                 print("Usage: hack game [--god | --off]", "res-info");
             }
             return;
         }
 
-        // 彩蛋
         if (cmd.includes('sudo')) {
             print("root: Permission denied. You are not the Admin.", "res-error");
             return;
@@ -187,12 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playTypingSound() {
-        // 利用已有的 sfx-hover，音量调低，变调
         const sfx = document.getElementById('sfx-hover');
         if (sfx) {
             sfx.currentTime = 0;
             sfx.volume = 0.2;
-            sfx.playbackRate = 1.5 + Math.random() * 0.5; // 随机音调，模拟打字
+            sfx.playbackRate = 1.5 + Math.random() * 0.5;
             sfx.play().catch(()=>{});
         }
     }
