@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phil | Cyberpunk Developer</title>
-
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23050505%22/><text y=%22.9em%22 font-size=%2280%22 fill=%22%2300fff2%22 font-family=%22monospace%22 font-weight=%22bold%22>P_</text></svg>">
-
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,31 +18,15 @@
 </div>
 
 <canvas id="matrix-canvas"></canvas>
+<div id="cyber-grid"></div>
+<div id="particles-js"></div>
+<div class="nav-overlay"></div>
 
-<audio id="bgm" loop>
-    <source src="bgm.mp3" type="audio/mpeg">
-</audio>
-<audio id="sfx-hover">
-    <source src="hover.mp3" type="audio/mpeg">
-</audio>
+<audio id="bgm" loop><source src="bgm.mp3" type="audio/mpeg"></audio>
+<audio id="sfx-hover"><source src="hover.mp3" type="audio/mpeg"></audio>
 
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
-
-<div class="fuel-widget">
-    <div class="fuel-status">
-        <i class="fas fa-bolt"></i> <span data-i18n="fuel_status">RECHARGE</span>
-    </div>
-    <div class="fuel-actions">
-        <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="fuel-btn paypal" title="PayPal"><i class="fab fa-paypal"></i></a>
-        <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="fuel-btn kofi" title="Ko-fi"><i class="fas fa-mug-hot"></i></a>
-    </div>
-</div>
-
-<div class="nav-overlay"></div>
-
-<div id="cyber-grid"></div>
-<div id="particles-js"></div>
 
 <nav>
     <div class="logo"><span>&lt;</span>Phil<span>/&gt;</span></div>
@@ -53,6 +34,7 @@
     <ul class="nav-links">
         <li><a href="#hero" class="nav-item" data-i18n="nav_home">Start</a></li>
         <li><a href="#about" class="nav-item" data-i18n="nav_about">Profile</a></li>
+        <li><a href="#experience" class="nav-item" data-i18n="exp_title">Log</a></li>
         <li><a href="#projects" class="nav-item" data-i18n="nav_work">Work</a></li>
         <li><a href="#plugins" class="nav-item" data-i18n="nav_plugins">Plugins</a></li>
         <li><a href="#game" class="nav-item" style="color:var(--danger-color); text-shadow: 0 0 10px var(--danger-color);" data-i18n="nav_game">Merge Hell</a></li>
@@ -75,7 +57,6 @@
                 <span data-i18n="hero_btn">View Profile</span> <i class="fas fa-arrow-down"></i>
             </a>
         </div>
-
         <div class="avatar-box" data-aos="zoom-in">
             <img src="p11_compressed.jpg" alt="Phil Base" class="img-base">
             <img src="p12-compressed.png" alt="Phil Cyber" class="img-hover">
@@ -111,71 +92,50 @@
 
 <section id="experience">
     <div class="section-title" data-aos="fade-up" data-i18n="exp_title">Execution Log</div>
-
     <div class="timeline-container">
         <div class="timeline-line-bg"></div>
         <div class="timeline-line-progress"></div>
-
         <div class="timeline-item">
             <div class="tl-point"></div>
             <div class="tl-content" data-aos="fade-left">
                 <div class="tl-date">2023 - PRESENT</div>
-                <div class="tl-header">
-                    <span class="commit-hash">#HEAD</span>
-                    <h3 data-i18n="exp_role_1">Lead Software Engineer</h3>
-                </div>
+                <div class="tl-header"><span class="commit-hash">#HEAD</span><h3 data-i18n="exp_role_1">Lead Software Engineer</h3></div>
                 <div class="tl-company" data-i18n="exp_comp_1">Top-Tier Investment Bank</div>
                 <p data-i18n="exp_desc_1">Leading the architectural design of next-generation financial trading platforms. Overseeing technical strategies, code reviews, and mentoring development teams in a high-frequency environment.</p>
             </div>
         </div>
-
         <div class="timeline-item">
             <div class="tl-point"></div>
             <div class="tl-content" data-aos="fade-left">
                 <div class="tl-date">2020 - 2023</div>
-                <div class="tl-header">
-                    <span class="commit-hash">#8f4a2d</span>
-                    <h3 data-i18n="exp_role_2">Senior Software Engineer</h3>
-                </div>
+                <div class="tl-header"><span class="commit-hash">#8f4a2d</span><h3 data-i18n="exp_role_2">Senior Software Engineer</h3></div>
                 <div class="tl-company" data-i18n="exp_comp_2">Fortune 500 Banking Group</div>
                 <p data-i18n="exp_desc_2">Architected critical file monitoring tools (AutoWatch Plus) and unified data platforms. Led code refactoring, JDK upgrades, and legacy system modernization for the GFT department.</p>
             </div>
         </div>
-
         <div class="timeline-item">
             <div class="tl-point"></div>
             <div class="tl-content" data-aos="fade-left">
                 <div class="tl-date">2017 - 2020</div>
-                <div class="tl-header">
-                    <span class="commit-hash">#d4e1fa</span>
-                    <h3 data-i18n="exp_role_3">Software Automation Engineer</h3>
-                </div>
+                <div class="tl-header"><span class="commit-hash">#d4e1fa</span><h3 data-i18n="exp_role_3">Software Automation Engineer</h3></div>
                 <div class="tl-company" data-i18n="exp_comp_3">Global Tech Solution Provider</div>
                 <p data-i18n="exp_desc_3">Spearheaded the customization of the GIAS insurance solution for North American clients. Facilitated agile development and cross-border communication as a core technical liaison.</p>
             </div>
         </div>
-
         <div class="timeline-item">
             <div class="tl-point"></div>
             <div class="tl-content" data-aos="fade-left">
                 <div class="tl-date">2014 - 2015</div>
-                <div class="tl-header">
-                    <span class="commit-hash">#1b2c3d</span>
-                    <h3 data-i18n="exp_role_edu">MSc Computer Science</h3>
-                </div>
+                <div class="tl-header"><span class="commit-hash">#1b2c3d</span><h3 data-i18n="exp_role_edu">MSc Computer Science</h3></div>
                 <div class="tl-company" data-i18n="exp_comp_edu">University of Leicester</div>
                 <p data-i18n="exp_desc_edu">Specialized in Advanced Computer Science. Developed a mobile web-based ontology editor for semantic web applications.</p>
             </div>
         </div>
-
         <div class="timeline-item">
             <div class="tl-point start-point"></div>
             <div class="tl-content" data-aos="fade-left">
                 <div class="tl-date">INIT</div>
-                <div class="tl-header">
-                    <span class="commit-hash">#000000</span>
-                    <h3>System.init()</h3>
-                </div>
+                <div class="tl-header"><span class="commit-hash">#000000</span><h3>System.init()</h3></div>
                 <p>Hello World.</p>
             </div>
         </div>
@@ -191,14 +151,12 @@
             <p style="color: #ccc;" data-i18n="p1_desc">Engineered a critical file monitoring system handling massive data flow. Led the migration to HDFS and optimized SLA alerting mechanisms.</p>
             <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Java, Spring, ActiveMQ]</div>
         </div>
-
         <div class="card" data-aos="zoom-in" data-aos-delay="200">
             <h3 data-i18n="p2_title"><i class="fas fa-database"></i> Unified Data Platform</h3>
             <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p2_client">Risk & Compliance Dept</p>
             <p style="color: #ccc;" data-i18n="p2_desc">Developed the 'Reference Data Service' module. Implemented Git-based version control for business data, ensuring auditability and safe rollback.</p>
             <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Guice, JGit, Groovy]</div>
         </div>
-
         <div class="card" data-aos="zoom-in" data-aos-delay="300">
             <h3 data-i18n="p3_title"><i class="fas fa-shield-alt"></i> Core Insurance System</h3>
             <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p3_client">Global Tech Firm</p>
@@ -227,7 +185,6 @@
         <p style="color: var(--primary-color); font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 1px;" data-i18n="game_warning">> SYSTEM OVERLOAD. INITIATING SEQUENCE...</p>
     </div>
     <div class="section-title" data-aos="fade-up" style="text-shadow: 0 0 20px var(--danger-color);"><span data-i18n="game_break">Break Time:</span> <span style="color:var(--danger-color)">Merge Hell</span></div>
-
     <div id="ide-window" data-aos="zoom-in">
         <div class="crt-overlay"></div>
         <div class="toolbar">
@@ -236,11 +193,9 @@
             <div style="color: #666; font-size: 12px;">git: master*</div>
             <div style="color: #666; font-size: 12px; margin-left:15px;">UTF-8</div>
         </div>
-
         <div id="game-container">
             <canvas id="gameCanvas"></canvas>
             <div id="warning-flash"></div>
-
             <div class="hud">
                 <div class="score-box">
                     <div><span data-i18n="hud_lines">Lines:</span> <span id="score-val">0</span></div>
@@ -255,38 +210,31 @@
                     <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
                 </div>
             </div>
-
             <div id="boss-hud">
                 <div class="boss-name" id="boss-name">⚠️ LEGACY CODE MONSTROSITY</div>
                 <div class="boss-hp-track"><div class="boss-hp-fill" id="boss-hp"></div></div>
             </div>
-
             <div id="start-screen" class="screen">
                 <h1>Escape <span>Merge Hell</span> v4.2</h1>
                 <p style="color: var(--primary-color); font-family:'JetBrains Mono'; letter-spacing: 1px;" data-i18n="game_desc">> Avoid Bugs. Commit Fixes. Defeat Legacy Code.</p>
-
                 <div class="controls-hint">
                     <div><span class="key">←</span> <span class="key">→</span> <span data-i18n="key_move">Move</span></div>
                     <div><span class="key">SPACE</span> <span data-i18n="key_jump">Jump</span></div>
                     <div><span class="key">C</span> <span data-i18n="key_shoot">Shoot (Commit)</span></div>
                 </div>
-
                 <button id="start-btn" class="game-btn" data-i18n="btn_run">Run 'Main'</button>
             </div>
-
             <div id="game-over-screen" class="screen" style="display: none;">
                 <h1 id="go-title" data-i18n="go_title">BUILD FAILED</h1>
                 <p id="go-reason" style="color: var(--danger-color); margin-bottom: 20px; text-shadow: 0 0 10px var(--danger-color);">NullPointerException</p>
                 <div style="margin-bottom: 30px; font-size: 20px; color: white;"><span data-i18n="go_score">Final Score:</span> <span id="final-score">0</span></div>
                 <button id="restart-btn" class="game-btn" data-i18n="btn_rebuild">Rebuild Project</button>
             </div>
-
             <div id="level-clear-screen" class="screen" style="display: none;">
                 <h1 id="lc-title" style="color: var(--string-green); text-shadow: 0 0 20px var(--string-green);" data-i18n="lc_title">LEVEL COMPLETE</h1>
                 <p id="lc-msg" style="color: white; font-size: 18px; text-align:center; padding:0 20px;">Module Refactored. Preparing Next Stage...</p>
             </div>
         </div>
-
         <div class="terminal" id="terminal">
             <div class="log-item info">[SYS] IDE Initialized. Waiting for user input...</div>
         </div>
@@ -296,9 +244,7 @@
 <div id="terminal-overlay" class="hidden">
     <div class="terminal-window">
         <div class="terminal-header">
-            <span class="btn-dot red"></span>
-            <span class="btn-dot yellow"></span>
-            <span class="btn-dot green"></span>
+            <span class="btn-dot red"></span><span class="btn-dot yellow"></span><span class="btn-dot green"></span>
             <span class="terminal-title">root@phil-server: ~ (zsh)</span>
         </div>
         <div class="terminal-body" id="terminal-content">
@@ -314,16 +260,41 @@
     <div class="terminal-hint">Press <span class="key-tag">ESC</span> or <span class="key-tag">~</span> to close</div>
 </div>
 
+<div class="fuel-widget">
+    <div class="fuel-status">
+        <i class="fas fa-bolt"></i> <span data-i18n="fuel_status">RECHARGE</span>
+    </div>
+    <div class="fuel-actions">
+        <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="fuel-btn paypal" title="PayPal"><i class="fab fa-paypal"></i></a>
+        <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="fuel-btn kofi" title="Ko-fi"><i class="fas fa-mug-hot"></i></a>
+    </div>
+</div>
+
+<div id="ai-widget-container">
+    <div id="ai-chat-window" class="hidden">
+        <div class="ai-header">
+            <div class="ai-status">
+                <span class="dot online"></span>
+                <span class="ai-title">Phil_AI_Assistant v2.0</span>
+            </div>
+            <div class="ai-close" onclick="toggleAIChat()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="ai-messages" id="ai-messages-area"></div>
+        <div class="ai-input-area" id="ai-options-area"></div>
+    </div>
+    <button id="ai-toggle-btn" onclick="toggleAIChat()">
+        <i class="fas fa-robot"></i><span class="pulse-ring"></span>
+    </button>
+</div>
+
 <footer>
     <div class="system-time" id="local-time">SYS_TIME: --:--:--</div>
     <p>Phil's Portfolio. <span style="color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color);" data-i18n="footer_text">No Bugs, Just Features.</span></p>
-
     <div class="social-links">
         <a href="mailto:bigphil.zhang@qq.com" target="_blank"><i class="fas fa-envelope"></i></a>
         <a href="https://github.com/rainism0329" target="_blank"><i class="fab fa-github"></i></a>
         <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank"><i class="fas fa-puzzle-piece"></i></a>
     </div>
-
     <div class="mobile-donate-container">
         <p class="mobile-fuel-label" data-i18n="mob_donate_label">>>> MOBILE RECHARGE UNIT</p>
         <div class="mobile-donate-btns">
@@ -331,21 +302,18 @@
             <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="mob-btn kofi"><i class="fas fa-mug-hot"></i></a>
         </div>
     </div>
-
     <div class="terminal-hint-footer">
         <span class="blink-symbol">>_</span> SYSTEM_ROOT: PRESS <span class="key-highlight">['~']</span> TO ACCESS
     </div>
-
     <div class="konami-hint">// KONAMI: ⬆⬆⬇⬇⬅➡⬅➡BA</div>
 </footer>
 
 <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
 <script src="js/game.js"></script>
 <script src="js/terminal.js"></script>
+<script src="js/ai-chat.js"></script>
 <script src="js/main.js"></script>
-
 </body>
 </html>
