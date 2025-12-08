@@ -1,14 +1,11 @@
 /**
- * Game Logic: Merge Hell
- * 包含游戏循环、实体类 (Player, Boss, Enemy) 以及碰撞检测
+ * Game Logic: Merge Hell (Fixed God Mode Persistence)
  */
 
-// 确保在 DOM 加载后初始化游戏，避免找不到 Canvas 元素
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 游戏初始化与配置 ---
     const canvas = document.getElementById('gameCanvas');
-    // 如果页面上没有游戏元素（例如在非游戏页面），则不执行后续逻辑
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
@@ -90,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shake: 0,
         level: 0,
         bossTriggerScore: 0,
+        godMode: false, // [关键修复] 新增全局作弊状态标志
         currentLevelConfig: LEVELS[0]
     };
 
@@ -102,8 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.addEventListener('resize', resize);
 
-    // 终端日志辅助函数
     function log(msg, type = 'info') {
+        if (!ui.terminal) return;
         const div = document.createElement('div');
         div.className = `log-item ${type}`;
         const time = new Date().toLocaleTimeString('en-US', {hour12:false});
@@ -163,9 +161,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.cooldown = 25;
             if (this.sudoMode > 0) {
-                this.sudoMode--;
+                // 如果是无限模式(God Mode开启时赋予的超大值)，则不倒计时
+                if (this.sudoMode < 900000) {
+                    this.sudoMode--;
+                }
+
                 ui.sudoTag.style.display = 'block';
                 this.cooldown = 8;
+
                 if(this.sudoMode === 0) {
                     ui.sudoTag.style.display = 'none';
                     log("Sudo permissions expired.", "warn");
@@ -193,7 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         takeDamage(amount) {
-            if (this.shieldTime > 0 || this.invincibleFrame > 0) return;
+            // 伤害判断：如果开启了 Shield, 无敌帧, 或者 Sudo Mode，则不受伤害
+            if (this.shieldTime > 0 || this.invincibleFrame > 0 || this.sudoMode > 0) return;
+
             this.hp -= amount;
             this.invincibleFrame = 60;
             state.shake = 10;
@@ -464,10 +469,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         texts.push(new FloatingText(player.x, player.y - 20, "SHIELD!", CONFIG.colors.shield));
                     }
                 } else {
-                    if (player.shieldTime > 0) {
+                    // [关键优化] 如果有无敌(Sudo Mode)或护盾，敌人直接爆炸，而不是造成伤害特效
+                    if (player.shieldTime > 0 || player.sudoMode > 0) {
                         e.dead = true;
-                        createExplosion(e.x, e.y, 5, CONFIG.colors.shield);
+                        // Sudo 模式是金色爆炸，护盾是蓝色爆炸
+                        const color = player.sudoMode > 0 ? CONFIG.colors.gold : CONFIG.colors.shield;
+                        createExplosion(e.x, e.y, 8, color);
+                        // 提示文字
+                        if(player.sudoMode > 0) texts.push(new FloatingText(e.x, e.y, "BLOCKED", color));
                     } else {
+                        // 正常受伤
                         e.dead = true;
                         player.takeDamage(e.damage);
                         createExplosion(player.x, player.y, 10, '#fff');
@@ -577,6 +588,12 @@ document.addEventListener('DOMContentLoaded', () => {
         state.bossTriggerScore = state.score + state.currentLevelConfig.runDuration;
 
         player = new Player();
+        // [关键修复] 每次开始新关卡或重启时，检查全局 GodMode 状态并应用
+        if (state.godMode) {
+            player.sudoMode = 999999;
+            ui.sudoTag.style.display = 'block';
+        }
+
         boss = new Boss(state.currentLevelConfig);
         enemies = [];
         projectiles = [];
@@ -606,26 +623,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endGame(reason) {
+        const lang = localStorage.getItem('site_lang') || 'en';
+        const titles = {
+            en: { vic: "PROJECT DEPLOYED", fail: "BUILD FAILED" },
+            zh: { vic: "项目部署成功", fail: "构建失败" }
+        };
+
         state.mode = reason.includes("VICTORY") ? 'VICTORY' : 'GAMEOVER';
         ui.screens.gameOver.style.display = 'flex';
+
+        const isVic = reason.includes("VICTORY");
+        const titleText = isVic ? titles[lang].vic : titles[lang].fail;
+
+        const goTitle = document.getElementById('go-title');
+        goTitle.innerText = titleText;
+
         document.getElementById('go-reason').innerText = reason;
         document.getElementById('final-score').innerText = Math.floor(state.score);
-        const title = document.getElementById('go-title');
-        if (reason.includes("VICTORY")) {
-            title.innerText = "PROJECT DEPLOYED";
-            title.style.color = CONFIG.colors.gold;
+
+        if (isVic) {
+            goTitle.style.color = CONFIG.colors.gold;
             document.getElementById('go-reason').style.color = CONFIG.colors.gold;
         } else {
-            title.innerText = "BUILD FAILED";
-            title.style.color = CONFIG.colors.boss;
+            goTitle.style.color = CONFIG.colors.boss;
             document.getElementById('go-reason').style.color = CONFIG.colors.boss;
         }
     }
 
     // --- 事件监听 ---
-
     window.addEventListener('keydown', e => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
         if(['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault();
+
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true;
         if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true;
         if (e.code === 'Space') {
@@ -642,11 +672,34 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'KeyC') input.shoot = false;
     });
 
-    // 绑定按钮点击事件
     const startBtn = document.getElementById('start-btn');
     const restartBtn = document.getElementById('restart-btn');
     if (startBtn) startBtn.onclick = startGame;
     if (restartBtn) restartBtn.onclick = startGame;
+
+    // --- [修复 & 升级] 暴露接口给终端使用 ---
+    window.gameInstance = {
+        // 开启上帝模式
+        enableGodMode: function() {
+            state.godMode = true; // [关键] 记录状态
+            if(player) {
+                player.sudoMode = 999999;
+                log("TERMINAL INJECTION: GOD MODE ENABLED", "warn");
+                texts.push(new FloatingText(player.x, player.y - 40, "HACKED!", CONFIG.colors.gold));
+                if(ui && ui.sudoTag) ui.sudoTag.style.display = 'block';
+            }
+        },
+        // 关闭上帝模式
+        disableGodMode: function() {
+            state.godMode = false; // [关键] 记录状态
+            if(player) {
+                player.sudoMode = 0;
+                log("TERMINAL INJECTION: GOD MODE DISABLED", "info");
+                texts.push(new FloatingText(player.x, player.y - 40, "NORMAL", CONFIG.colors.player));
+                if(ui && ui.sudoTag) ui.sudoTag.style.display = 'none';
+            }
+        }
+    };
 
     // 初始化
     resize();

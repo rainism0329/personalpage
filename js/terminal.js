@@ -1,6 +1,6 @@
 /**
- * Terminal Logic
- * 模拟黑客终端交互，同步了最新的个人信息和项目经历
+ * Terminal Logic v2.0
+ * Features: I18n, Game Cheats, Typing SFX
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,62 +8,85 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('cli-input');
     const content = document.getElementById('terminal-content');
 
-    // 防止重复初始化
     if (!overlay || !input || !content) return;
 
     let isVisible = false;
 
-    // --- 1. 核心控制逻辑 ---
+    // --- 1. 多语言语料库 ---
+    const termData = {
+        en: {
+            welcome: "Welcome to Phil's Terminal v2.0 (kernel 5.15)",
+            help_desc: "Type <span class='cmd-highlight'>'help'</span> to see available commands.",
+            help_list: "Available commands:",
+            cmd_whoami: "View user profile",
+            cmd_projects: "List system architectures",
+            cmd_contact: "Get encrypted channels",
+            cmd_hack: "Inject cheats into Game Module",
+            cmd_clear: "Clear terminal history",
+            cmd_exit: "Close session",
+            info_name: "Name: Mingzhe (Phil) Zhang",
+            info_role: "Role: Lead Software Engineer",
+            hack_success: ">> INJECTION SUCCESSFUL. GOD MODE ENABLED.",
+            hack_fail: ">> ERROR: Game module not running.",
+            err_cmd: "Command not found:"
+        },
+        zh: {
+            welcome: "欢迎访问 Phil 的终端 v2.0 (内核 5.15)",
+            help_desc: "输入 <span class='cmd-highlight'>'help'</span> 查看可用命令。",
+            help_list: "可用命令列表:",
+            cmd_whoami: "查看用户档案",
+            cmd_projects: "列出系统架构",
+            cmd_contact: "获取加密联系方式",
+            cmd_hack: "向游戏模块注入作弊码",
+            cmd_clear: "清除屏幕",
+            cmd_exit: "关闭会话",
+            info_name: "姓名: 张明哲 (Phil)",
+            info_role: "职位: 首席软件工程师 (Lead)",
+            hack_success: ">> 注入成功。无敌模式已开启 (God Mode)。",
+            hack_fail: ">> 错误: 游戏模块未运行。",
+            err_cmd: "未找到命令:"
+        }
+    };
 
+    function getLang() { return localStorage.getItem('site_lang') || 'en'; }
+
+    // --- 2. 核心控制 ---
     function toggleTerminal() {
         isVisible = !isVisible;
         if (isVisible) {
-            overlay.classList.remove('hidden'); // 移除 hidden 类
-            // 强制重绘以触发 transition
+            overlay.classList.remove('hidden');
             void overlay.offsetWidth;
             overlay.classList.add('active');
             input.value = '';
             setTimeout(() => input.focus(), 100);
+
+            // 每次打开显示欢迎语
+            const t = termData[getLang()];
+            // content.innerHTML = ''; // 可选：每次清空
+            print(t.welcome, "res-info");
+            print(t.help_desc);
         } else {
             overlay.classList.remove('active');
-            setTimeout(() => {
-                if(!isVisible) overlay.classList.add('hidden');
-            }, 300); // 等待动画结束
+            setTimeout(() => { if(!isVisible) overlay.classList.add('hidden'); }, 300);
             input.blur();
         }
     }
 
-    // 监听全局按键 (呼出/隐藏)
     document.addEventListener('keydown', (e) => {
-        // 监听 ` 或 ~ 键
-        if (e.key === '`' || e.key === '~') {
-            e.preventDefault();
-            toggleTerminal();
-        }
-        // ESC 键关闭
-        if (e.key === 'Escape' && isVisible) {
-            toggleTerminal();
-        }
+        if (e.key === '`' || e.key === '~') { e.preventDefault(); toggleTerminal(); }
+        if (e.key === 'Escape' && isVisible) toggleTerminal();
     });
 
-    // 点击遮罩关闭
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) toggleTerminal();
-    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) toggleTerminal(); });
 
-    // --- 2. 命令处理系统 ---
-
+    // --- 3. 命令处理 ---
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             const cmd = input.value.trim();
-            if (cmd) {
-                processCommand(cmd);
-            }
+            if (cmd) processCommand(cmd);
             input.value = '';
-            // 自动滚动到底部
-            setTimeout(() => {
-                content.scrollTop = content.scrollHeight;
-            }, 10);
+            setTimeout(() => content.scrollTop = content.scrollHeight, 10);
+            playTypingSound(); // 播放回车音效
         }
     });
 
@@ -75,86 +98,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processCommand(rawCmd) {
-        // 打印输入历史
         print(`<span style="color:#50fa7b">root@phil:~$</span> ${rawCmd}`);
-
         const cmd = rawCmd.toLowerCase();
+        const t = termData[getLang()]; // 获取当前语言文本
 
-        switch (cmd) {
-            case 'help':
-                print("Available commands:");
-                print("&nbsp; - <span class='cmd-highlight'>whoami</span>   : View user profile");
-                print("&nbsp; - <span class='cmd-highlight'>projects</span> : List system architectures");
-                print("&nbsp; - <span class='cmd-highlight'>contact</span>  : Get encrypted channels");
-                print("&nbsp; - <span class='cmd-highlight'>clear</span>    : Clear terminal history");
-                print("&nbsp; - <span class='cmd-highlight'>exit</span>     : Close session");
-                break;
+        // 简单的打字音效模拟
+        playTypingSound();
 
-            case 'whoami':
-                // [UPDATE] 同步了最新的 Lead Title
-                print("Name: Mingzhe (Phil) Zhang", "res-info");
-                print("Role: <span style='color:var(--primary-color)'>Lead Software Engineer</span>", "res-info");
-                print("Org : Top-Tier Investment Bank", "res-info");
-                print("Loc : Singapore / Shanghai", "res-info");
-                print("Tag : Java Expert, High-Frequency Trading, Cloud Native", "res-info");
-                break;
+        // 基础命令解析
+        if (cmd === 'help') {
+            print(t.help_list);
+            print(`&nbsp; - <span class='cmd-highlight'>whoami</span>   : ${t.cmd_whoami}`);
+            print(`&nbsp; - <span class='cmd-highlight'>projects</span> : ${t.cmd_projects}`);
+            print(`&nbsp; - <span class='cmd-highlight'>contact</span>  : ${t.cmd_contact}`);
+            print(`&nbsp; - <span class='cmd-highlight'>hack game</span>: ${t.cmd_hack}`);
+            print(`&nbsp; - <span class='cmd-highlight'>clear</span>    : ${t.cmd_clear}`);
+            print(`&nbsp; - <span class='cmd-highlight'>exit</span>     : ${t.cmd_exit}`);
+            return;
+        }
 
-            case 'projects':
-                print("Fetching deployed modules...", "res-warn");
-                setTimeout(() => {
-                    // [UPDATE] 新增了 Nomura 相关的项目描述
-                    print("1. Next-Gen Trading Platform [Lead Arch]", "res-info");
-                    print("&nbsp;&nbsp; -> High-concurrency financial trading system.", "res-info");
+        if (cmd === 'whoami') {
+            print(t.info_name, "res-info");
+            print(`${t.info_role} <span style='color:var(--gold)'>[Top-Tier IB]</span>`, "res-info");
+            return;
+        }
 
-                    print("2. Enterprise Monitor (AWP) [Java/Spring]", "res-info");
-                    print("&nbsp;&nbsp; -> SLA-critical file monitoring for banking.", "res-info");
+        if (cmd === 'projects') {
+            // 项目列表保持双语或者通用英文即可，这里演示通用
+            print("1. Next-Gen Trading Platform [Lead Arch]", "res-info");
+            print("2. AutoWatch Plus (Citi) [Java/Spring]", "res-info");
+            return;
+        }
 
-                    print("3. Unified Data Platform [Guice/Groovy]", "res-info");
+        if (cmd === 'contact') {
+            print("Email : <a href='mailto:bigphil.zhang@qq.com' style='color:var(--primary-color)'>bigphil.zhang@qq.com</a>");
+            return;
+        }
 
-                    print("4. Intelli-Plugins (RestPilot/Parquet) [Open Source]", "res-info");
-                }, 400);
-                break;
+        if (cmd === 'clear') { content.innerHTML = ''; return; }
+        if (cmd === 'exit') { toggleTerminal(); return; }
 
-            case 'contact':
-                // [UPDATE] 同步了新的 QQ 邮箱
-                print("Email : <a href='mailto:bigphil.zhang@qq.com' style='color:var(--primary-color)'>bigphil.zhang@qq.com</a>");
-                print("GitHub: <a href='https://github.com/rainism0329' target='_blank' style='color:var(--primary-color)'>rainism0329</a>");
-                break;
+        // --- 联动功能：重启页面 ---
+        if (cmd === 'reboot' || cmd === 'sudo reboot') {
+            print("SYSTEM REBOOT INITIATED...", "res-warn");
+            document.body.style.transition = "opacity 1s";
+            document.body.style.opacity = "0";
+            setTimeout(() => location.reload(), 1500);
+            return;
+        }
 
-            case 'clear':
-                content.innerHTML = '';
-                print("Terminal cleared.");
-                break;
+        // ... 在 processCommand 函数内部 ...
 
-            case 'exit':
-                toggleTerminal();
-                break;
+        // --- 联动功能：黑入游戏 ---
+        if (cmd.includes('hack game')) {
+            // 1. 开启无敌
+            if (cmd.includes('--god')) {
+                if (window.gameInstance) {
+                    window.gameInstance.enableGodMode();
+                    print(t.hack_success, "res-warn");
+                } else {
+                    print(t.hack_fail, "res-error");
+                }
+            }
+            // 2. [新增] 关闭无敌
+            else if (cmd.includes('--off') || cmd.includes('--clear')) {
+                if (window.gameInstance) {
+                    window.gameInstance.disableGodMode();
+                    const msg = getLang() === 'zh' ? ">> 作弊码已清除。系统恢复正常。" : ">> HACK DISABLED. SYSTEM NORMAL.";
+                    print(msg, "res-info");
+                } else {
+                    print(t.hack_fail, "res-error");
+                }
+            }
+            // 3. 提示用法
+            else {
+                print("Usage: hack game [--god | --off]", "res-info");
+            }
+            return;
+        }
 
-            // 彩蛋部分
-            case 'sudo':
-                print("root@phil: Permission denied.", "res-error");
-                print("Nice try. But you are not the Architect.", "res-warn");
-                break;
+        // 彩蛋
+        if (cmd.includes('sudo')) {
+            print("root: Permission denied. You are not the Admin.", "res-error");
+            return;
+        }
 
-            case 'rm -rf /':
-                print("⚠️ SYSTEM ALERT: Self-destruct sequence initiated...", "res-error");
-                setTimeout(() => print("Just kidding. Don't do that.", "res-info"), 1000);
-                break;
+        print(`${t.err_cmd} ${cmd}`, "res-error");
+    }
 
-            case 'ls':
-                print("access_logs.txt", "res-info");
-                print("secret_keys.pem <span style='color:red'>(Encrypted)</span>", "res-info");
-                print("todo_list.md", "res-info");
-                break;
-
-            case 'cat todo_list.md':
-                print("- Refactor legacy code", "res-info");
-                print("- Drink coffee", "res-info");
-                print("- Deploy to production (Friday 5PM)", "res-info");
-                break;
-
-            default:
-                print(`Command not found: ${cmd}. Type 'help' for list.`, "res-error");
+    function playTypingSound() {
+        // 利用已有的 sfx-hover，音量调低，变调
+        const sfx = document.getElementById('sfx-hover');
+        if (sfx) {
+            sfx.currentTime = 0;
+            sfx.volume = 0.2;
+            sfx.playbackRate = 1.5 + Math.random() * 0.5; // 随机音调，模拟打字
+            sfx.play().catch(()=>{});
         }
     }
 });
