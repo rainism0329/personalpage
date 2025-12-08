@@ -300,17 +300,32 @@ document.addEventListener('DOMContentLoaded', () => {
             this.active = false;
             ui.bossHud.style.display = 'none';
             createMegaExplosion(this.x + this.w/2, this.y + this.h/2, CONFIG.colors.boss);
+
             const nextLevel = state.level + 1;
+
             if (nextLevel < LEVELS.length) {
+                // --- 普通关卡过关 ---
                 state.mode = 'LEVEL_CLEAR';
-                log(`LEVEL ${nextLevel} UNLOCKED. Preparing next environment...`, "gold");
+                log(`>> MODULE ${state.level + 1} REFACTORED. COMPILING NEXT...`, "gold");
                 ui.screens.levelClear.style.display = 'flex';
-                document.getElementById('lc-msg').innerText = `Module ${state.level + 1} Refactored. Preparing Level ${nextLevel + 1}: ${LEVELS[nextLevel].name}...`;
+                document.getElementById('lc-msg').innerText = `Module ${state.level + 1} Refactored. Loading ${LEVELS[nextLevel].name}...`;
                 setTimeout(() => { state.level = nextLevel; startLevel(); }, 3000);
             } else {
+                // --- [优化] 最终通关逻辑 ---
                 state.mode = 'VICTORY';
-                log("ALL REFACTORING COMPLETE. PROJECT DEPLOYED.", "gold");
-                setTimeout(() => endGame("TOTAL VICTORY: Project Deployed"), 3000);
+
+                // 1. 记录成就 (持久化)
+                localStorage.setItem('phil_game_cleared', 'true');
+
+                // 2. 终端刷屏特效
+                runDeploymentSequence();
+
+                // 3. 视觉净化特效 (背景变绿/金)
+                document.getElementById('game-container').style.transition = "background-color 2s";
+                document.getElementById('game-container').style.backgroundColor = "#001a00"; // 黑客绿背景
+
+                // 4. 延迟显示结算
+                setTimeout(() => endGame("TOTAL VICTORY: SYSTEM ONLINE"), 6000); // 给足够时间看特效
             }
         }
         draw() {
@@ -424,6 +439,38 @@ document.addEventListener('DOMContentLoaded', () => {
             particles.push(new Particle(x, y, i % 3 === 0 ? CONFIG.colors.gold : (i % 3 === 1 ? CONFIG.colors.player : color), Math.cos(angle) * speed, Math.sin(angle) * speed, 0.02 + Math.random()*0.01));
         }
         state.shake = 30;
+    }
+
+    // --- [新增] 通关时的终端刷屏特效 ---
+    function runDeploymentSequence() {
+        const logs = [
+            "Initiating final build sequence...",
+            "Compiling assets... [OK]",
+            "Optimizing database queries... [OK]",
+            "Running unit tests (4029/4029)... [PASSED]",
+            "Eliminating legacy bugs... [DONE]",
+            "Deploying to Production Cluster...",
+            "Starting Kubernetes pods...",
+            "Verifying SSL certificates...",
+            ">> SYSTEM ONLINE. WELCOME BACK, ARCHITECT."
+        ];
+
+        let delay = 0;
+        logs.forEach((msg, index) => {
+            // 越往后越快，模拟刷屏感
+            delay += (index === logs.length - 1) ? 1500 : 400;
+            setTimeout(() => {
+                // 如果是最后一条，用金色显示
+                const type = (index === logs.length - 1) ? "gold" : "info";
+                log(msg, type);
+
+                // 每次打印都播放一点音效 (如果 main.js 支持)
+                if(index % 2 === 0) {
+                    const sfx = document.getElementById('sfx-hover');
+                    if(sfx) { sfx.currentTime=0; sfx.play().catch(()=>{}); }
+                }
+            }, delay);
+        });
     }
 
     function spawnManager() {

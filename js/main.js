@@ -430,4 +430,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // 检查是否通关过游戏
+    if (localStorage.getItem('phil_game_cleared') === 'true') {
+        const nameTitle = document.querySelector('.hero-text h1');
+        if (nameTitle) {
+            // 在名字后面加一个金色的奖杯
+            nameTitle.innerHTML += ' <i class="fas fa-trophy" style="color:#f1fa8c; font-size:0.6em; vertical-align:middle; cursor:help;" title="Game Cleared: S-Class Architect"></i>';
+        }
+    }
 });
