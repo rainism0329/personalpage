@@ -1,6 +1,6 @@
 /**
  * Main UI Logic
- * 处理导航、翻译、音频系统、光标特效、Preloader以及矩阵雨彩蛋
+ * 处理导航、翻译、音频系统、光标特效、Preloader、矩阵雨彩蛋 以及 职业生涯时间轴特效
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -106,11 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
             hero_desc: "Crafting robust backend systems and navigating through complex architectures in the digital frontier.",
             hero_btn: "View Profile",
             about_title: "System Stats", profile_title: "Profile",
-            label_role: "Role:", val_role: "Senior Software Engineer",
+            label_role: "Role:", val_role: "Lead Software Engineer",
             label_edu: "Education:", val_edu: "MSc Computer Science, Univ. of Leicester",
             label_focus: "Focus:", val_focus: "High-performance Backend, Cloud Architecture",
-            label_curr: "Current:", val_curr: "Fortune 500 Financial Institution",
+            label_curr: "Current:", val_curr: "Top-Tier Investment Bank",
             stack_title: "Tech Stack",
+            exp_title: "Execution Log",
+            exp_role_1: "Lead Software Engineer", exp_comp_1: "Top-Tier Investment Bank", exp_desc_1: "Leading the architectural design of next-generation financial trading platforms. Overseeing technical strategies, code reviews, and mentoring development teams in a high-frequency environment.",
+            exp_role_2: "Senior Software Engineer", exp_comp_2: "Fortune 500 Banking Group", exp_desc_2: "Architected critical file monitoring tools (AutoWatch Plus) and unified data platforms. Led code refactoring, JDK upgrades, and legacy system modernization for the GFT department.",
+            exp_role_3: "Software Automation Engineer", exp_comp_3: "Global Tech Solution Provider", exp_desc_3: "Spearheaded the customization of the GIAS insurance solution for North American clients. Facilitated agile development and cross-border communication as a core technical liaison.",
+            exp_role_edu: "MSc Computer Science", exp_comp_edu: "University of Leicester", exp_desc_edu: "Specialized in Advanced Computer Science. Developed a mobile web-based ontology editor for semantic web applications.",
             projects_title: "Deployed Builds",
             p1_title: "Enterprise Monitor", p1_client: "Fortune 500 Finance Firm",
             p1_desc: "Engineered a critical file monitoring system handling massive data flow. Led the migration to HDFS and optimized SLA alerting mechanisms.",
@@ -141,11 +146,16 @@ document.addEventListener('DOMContentLoaded', () => {
             hero_desc: "在数字前沿构建稳健的后端系统，驾驭复杂的架构设计。",
             hero_btn: "查看详情",
             about_title: "系统状态", profile_title: "个人档案",
-            label_role: "职位:", val_role: "高级软件工程师",
+            label_role: "职位:", val_role: "首席软件工程师 (Lead)",
             label_edu: "教育:", val_edu: "莱斯特大学 高级计算机科学硕士",
             label_focus: "专注:", val_focus: "高性能后端, 云原生架构",
-            label_curr: "当前:", val_curr: "世界500强金融机构",
+            label_curr: "当前:", val_curr: "顶级投资银行",
             stack_title: "技术栈",
+            exp_title: "执行日志 (Experience)",
+            exp_role_1: "首席软件工程师", exp_comp_1: "顶级投资银行", exp_desc_1: "主导下一代金融交易平台的架构设计。在高频交易环境下负责技术战略制定、代码审查及开发团队的指导与培养。",
+            exp_role_2: "高级软件工程师", exp_comp_2: "世界500强银行集团", exp_desc_2: "设计了关键文件监控工具 (AutoWatch Plus) 及统一数据平台。领导了 GFT 部门的代码重构、JDK 升级及遗留系统现代化改造。",
+            exp_role_3: "软件自动化工程师", exp_comp_3: "全球技术解决方案提供商", exp_desc_3: "主导了北美客户 GIAS 保险解决方案的定制化开发。作为核心技术联络人，推动敏捷开发及跨国团队沟通。",
+            exp_role_edu: "高级计算机科学硕士", exp_comp_edu: "英国莱斯特大学", exp_desc_edu: "主修高级计算机科学。开发了用于语义网应用的移动端本体编辑器。",
             projects_title: "已部署项目",
             p1_title: "企业级监控系统", p1_client: "世界500强金融企业",
             p1_desc: "设计了处理海量数据流的核心文件监控系统。主导了向 HDFS 的迁移并优化了 SLA 警报机制。",
@@ -185,9 +195,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const span = el.querySelector('span');
                     if(span) span.innerText = t[key];
                 } else if (el.children.length > 0 && el.tagName !== 'BUTTON') {
+                    // 处理带图标的情况，保留图标，只替换文本节点
+                    // 简单处理：清空后重新添加图标和文本
                     const icon = el.querySelector('i');
-                    el.innerText = t[key];
-                    if(icon) el.prepend(icon);
+                    if (icon) {
+                        // 保存图标 HTML
+                        const iconHtml = icon.outerHTML;
+                        el.innerHTML = iconHtml + ' ' + t[key];
+                    } else {
+                        el.innerText = t[key];
+                    }
                 } else {
                     el.innerText = t[key];
                 }
@@ -248,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener("mousedown", () => { document.body.classList.add("clicking"); });
         document.addEventListener("mouseup", () => { document.body.classList.remove("clicking"); });
 
-        document.querySelectorAll("a, button, .card, .game-btn, .fuel-btn").forEach(link => {
+        document.querySelectorAll("a, button, .card, .game-btn, .fuel-btn, .timeline-item").forEach(link => {
             link.addEventListener("mouseenter", () => { document.body.classList.add("hover-link"); });
             link.addEventListener("mouseleave", () => { document.body.classList.remove("hover-link"); });
         });
@@ -373,5 +390,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (matrixInterval) clearInterval(matrixInterval);
         matrixInterval = setInterval(drawMatrix, 30);
+    }
+
+    // --- 9. EXPERIENCE TIMELINE ANIMATION (新增：时间轴充能动效) ---
+    const timelineContainer = document.querySelector('.timeline-container');
+    const timelineProgress = document.querySelector('.timeline-line-progress');
+    const timelineItems = document.querySelectorAll('.timeline-item');
+
+    if (timelineContainer && timelineProgress && timelineItems.length > 0) {
+        window.addEventListener('scroll', () => {
+            const containerRect = timelineContainer.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            // 计算容器相对于视口的位置
+            // 我们希望线从容器顶部开始，延伸到屏幕中心线偏下的位置 (e.g. 70%)
+            const triggerPoint = windowHeight * 0.7;
+            const containerTop = containerRect.top;
+            const containerHeight = containerRect.height;
+
+            // 计算进度: (屏幕触发线 - 容器顶部)
+            let progress = (triggerPoint - containerTop);
+
+            // 边界处理：不能小于0，不能大于总高度
+            if (progress < 0) progress = 0;
+            if (progress > containerHeight) progress = containerHeight;
+
+            // 设置亮线的高度 (像素)
+            timelineProgress.style.height = `${progress}px`;
+
+            // 逐个检查节点是否被“点亮”
+            timelineItems.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+                // 如果节点的顶部 位于 触发线 之上，说明光线已经流过它了
+                if (itemTop < triggerPoint) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
     }
 });
