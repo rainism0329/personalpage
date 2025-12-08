@@ -4,924 +4,275 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phil | Cyberpunk Developer</title>
-    
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23050505%22/><text y=%22.9em%22 font-size=%2280%22 fill=%22%2300fff2%22 font-family=%22monospace%22 font-weight=%22bold%22>P_</text></svg>">
 
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <style>
-        /* --- GLOBAL VARIABLES --- */
-        :root {
-            --bg-color: #050505;
-            --text-color: #e0e0e0;
-            --primary-color: #00fff2; /* Cyber Cyan */
-            --secondary-color: #bd00ff; /* Neon Purple */
-            --danger-color: #ff0055; /* Cyber Red */
-            --card-bg: rgba(20, 20, 25, 0.8);
-            --nav-height: 70px;
-            
-            /* Game Colors */
-            --ui-bg: #1a1a1d;
-            --string-green: #50fa7b;
-            --gold: #f1fa8c;
-            --shield-cyan: #8be9fd;
-        }
-
-        /* --- GLOBAL RESET --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            overflow-x: hidden;
-            position: relative;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        body.scroll-locked { overflow: hidden !important; }
-        a, button, canvas, input, .hamburger, .nav-overlay, .fuel-widget, .fuel-btn, .audio-toggle { cursor: none !important; }
-
-        /* --- MATRIX RAIN CANVAS --- */
-        #matrix-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 999998; /* Below Cursor */
-            pointer-events: none; /* Allow clicking through */
-            opacity: 0; transition: opacity 1s; display: none;
-            mix-blend-mode: screen;
-        }
-        #matrix-canvas.active { display: block; opacity: 0.9; }
-
-        /* --- PRELOADER --- */
-        #preloader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 999999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .loader-text { color: var(--primary-color); margin-bottom: 20px; font-size: 1.2rem; text-shadow: 0 0 10px var(--primary-color); }
-        .loader-bar { width: 300px; height: 4px; background: #333; position: relative; overflow: hidden; }
-        .loader-progress { width: 0%; height: 100%; background: var(--primary-color); box-shadow: 0 0 20px var(--primary-color); animation: loadProgress 2s ease-in-out forwards; }
-        @keyframes loadProgress { 0% {width: 0%;} 40% {width: 30%;} 70% {width: 70%;} 100% {width: 100%;} }
-
-        /* --- CUSTOM CURSOR --- */
-        #cursor-dot, #cursor-ring { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 999999; pointer-events: none; }
-        #cursor-dot { width: 6px; height: 6px; background: #fff; box-shadow: 0 0 10px #fff; }
-        #cursor-ring { width: 40px; height: 40px; border: 2px solid var(--primary-color); box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px rgba(0, 255, 242, 0.2); transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s; }
-        
-        body.clicking #cursor-ring { width: 30px; height: 30px; background-color: rgba(0, 255, 242, 0.3); }
-        body.hover-link #cursor-dot { background: var(--secondary-color); }
-        body.hover-link #cursor-ring { width: 60px; height: 60px; border-color: var(--secondary-color); background-color: rgba(189, 0, 255, 0.05); box-shadow: 0 0 20px var(--secondary-color); border-width: 1px; }
-        body.hover-danger #cursor-dot { background: var(--danger-color); }
-        body.hover-danger #cursor-ring { width: 50px; height: 50px; border-color: var(--danger-color); box-shadow: 0 0 20px var(--danger-color); border-style: dashed; animation: rotate-cursor 4s linear infinite; }
-        @keyframes rotate-cursor { 0% {transform: translate(-50%, -50%) rotate(0deg);} 100% {transform: translate(-50%, -50%) rotate(360deg);} }
-
-        /* Scrollbar & Selection */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; border: 1px solid transparent; background-clip: content-box; }
-        ::-webkit-scrollbar-thumb:hover { background-color: var(--primary-color); }
-        ::selection { background: var(--secondary-color); color: #fff; text-shadow: none; }
-        ::-moz-selection { background: var(--secondary-color); color: #fff; text-shadow: none; }
-
-        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 9990; opacity: 0.7; }
-        h1, h2, h3, .font-code { font-family: 'JetBrains Mono', monospace; }
-        a { text-decoration: none; color: var(--text-color); transition: 0.3s; }
-
-        #cyber-grid { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -2; background: linear-gradient(rgba(0, 255, 242, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 242, 0.1) 1px, transparent 1px), linear-gradient(rgba(189, 0, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(189, 0, 255, 0.1) 1px, transparent 1px); background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px; background-position: center center; transform: perspective(500px) rotateX(60deg) scale(2) translateY(-100px); opacity: 0.4; mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 30%); }
-        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
-
-        /* --- NAV --- */
-        nav { height: var(--nav-height); display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 2px solid transparent; border-image: linear-gradient(to right, var(--primary-color), var(--secondary-color)) 1; padding: 0 5%; box-shadow: 0 5px 20px rgba(0, 255, 242, 0.1); }
-        .logo span { color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
-        .logo { font-size: 1.5rem; font-weight: bold; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;}
-        .nav-links { display: flex; list-style: none; gap: 20px; align-items: center; }
-        .nav-links a:hover, .nav-links a.active { color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color); }
-        
-        .lang-switch { background: rgba(0, 255, 242, 0.1); border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 12px; font-family: 'JetBrains Mono'; font-size: 0.8rem; cursor: pointer; transition: 0.3s; box-shadow: 0 0 5px var(--primary-color); }
-        .lang-switch:hover { background: var(--primary-color); color: #000; box-shadow: 0 0 15px var(--primary-color); }
-        
-        /* Audio Toggle */
-        .audio-toggle {
-            background: transparent; border: 1px solid #444; color: #666;
-            width: 35px; height: 35px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s;
-        }
-        .audio-toggle.playing {
-            border-color: var(--secondary-color); color: var(--secondary-color);
-            box-shadow: 0 0 10px var(--secondary-color);
-            animation: soundPulse 1s infinite alternate;
-        }
-        @keyframes soundPulse { from { box-shadow: 0 0 5px var(--secondary-color); } to { box-shadow: 0 0 15px var(--secondary-color); transform: scale(1.1); } }
-
-        .hamburger { display: none; font-size: 1.5rem; color: var(--primary-color); cursor: pointer; z-index: 1002; }
-        .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s; }
-        .nav-overlay.active { display: block; opacity: 1; }
-
-        section { padding: 100px 10%; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
-        .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 50px; color: #fff; text-transform: uppercase; letter-spacing: 4px; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 5px #fff, 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 40px var(--secondary-color); }
-
-        /* Hero & Avatar */
-        .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 50px; }
-        .hero-text h1 { font-size: 3.5rem; line-height: 1.2; position: relative; z-index: 10; }
-        .glitch { position: relative; color: #ffffff; font-weight: 800; text-shadow: 3px 3px 0px var(--secondary-color), -3px -3px 0px var(--primary-color); }
-        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; opacity: 0.8; }
-        .glitch::before { left: 3px; text-shadow: -2px 0 var(--danger-color); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 2.5s infinite linear alternate-reverse; }
-        .glitch::after { left: -3px; text-shadow: -2px 0 var(--primary-color); box-shadow: 0 0 10px var(--primary-color); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 3s infinite linear alternate-reverse; }
-        @keyframes glitch-anim { 0% { clip: rect(30px, 9999px, 10px, 0); transform: skew(0.85deg); } 20% { clip: rect(85px, 9999px, 90px, 0); transform: skew(-0.5deg); } 100% { clip: rect(20px, 9999px, 60px, 0); transform: skew(0.1deg); } }
-        @keyframes glitch-anim2 { 0% { clip: rect(10px, 9999px, 80px, 0); transform: skew(2deg); } 100% { clip: rect(10px, 9999px, 90px, 0); transform: skew(-1deg); } }
-
-        /* Secure Avatar */
-        .avatar-box { 
-            width: 280px; height: 280px; border-radius: 50%; border: 4px solid transparent; 
-            background-image: linear-gradient(var(--bg-color), var(--bg-color)), linear-gradient(45deg, var(--primary-color), var(--secondary-color)); 
-            background-origin: border-box; background-clip: content-box, border-box; 
-            box-shadow: 0 0 30px rgba(0, 255, 242, 0.3), 0 0 60px rgba(189, 0, 255, 0.2); 
-            overflow: hidden; position: relative; transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            -webkit-touch-callout: none;
-        }
-        .avatar-box img { width: 100%; height: 100%; object-fit: cover; transition: all 0.5s ease; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; position: absolute; top: 0; left: 0; }
-        .img-base { opacity: 1; z-index: 1; }
-        .img-hover { opacity: 0; z-index: 2; filter: brightness(1.2) contrast(1.1); }
-        .avatar-box:hover { box-shadow: 0 0 50px var(--primary-color), 0 0 80px var(--secondary-color); transform: translateY(-5px); }
-        .avatar-box:hover img { transform: scale(1.08); }
-        .avatar-box:hover .img-base { opacity: 0; }
-        .avatar-box:hover .img-hover { opacity: 1; animation: holo-flicker 0.4s ease-out forwards; }
-        @keyframes holo-flicker { 0% { opacity: 0; filter: brightness(3); } 20% { opacity: 0.5; } 40% { opacity: 1; filter: brightness(1.2) contrast(1.1) hue-rotate(10deg); } 100% { opacity: 1; filter: brightness(1.2) contrast(1.1) hue-rotate(0deg); } }
-
-        /* Cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; }
-        .card { background: var(--card-bg); padding: 25px; border-radius: 2px; border: 1px solid rgba(0, 255, 242, 0.2); transition: 0.4s; position: relative; z-index: 2; backdrop-filter: blur(5px); background-image: radial-gradient(rgba(0, 255, 242, 0.1) 1px, transparent 1px); background-size: 20px 20px; }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid transparent; pointer-events: none; transition: 0.4s; }
-        .card:hover { transform: translateY(-10px) scale(1.02); box-shadow: -5px -5px 20px rgba(0, 255, 242, 0.4), 5px 5px 20px rgba(189, 0, 255, 0.4), inset 0 0 20px rgba(0, 255, 242, 0.1); border-color: rgba(255,255,255,0.1); }
-        .card:hover::before { border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; animation: border-flow 2s linear infinite; }
-        @keyframes border-flow { 0%{clip-path: inset(0 0 98% 0);} 25%{clip-path: inset(0 98% 0 0);} 50%{clip-path: inset(98% 0 0 0);} 75%{clip-path: inset(0 0 0 98%);} 100%{clip-path: inset(0 0 98% 0);} }
-        .card h3 { color: var(--primary-color); text-shadow: 0 0 10px rgba(0, 255, 242, 0.5); }
-        .skill-tag { display: inline-block; padding: 5px 15px; margin: 5px 2px; border: 1px solid var(--primary-color); color: var(--primary-color); background: rgba(0, 255, 242, 0.1); border-radius: 0px; font-size: 0.8rem; font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; position: relative; overflow: hidden; }
-        .skill-tag:hover { background: var(--primary-color); color: #000; box-shadow: 0 0 15px var(--primary-color); }
-
-        /* Center Plugins */
-        .centered-container { max-width: 800px; width: 100%; margin: 0 auto; }
-        .feature-card {
-            background: linear-gradient(135deg, rgba(189, 0, 255, 0.1) 0%, rgba(20, 20, 25, 0.9) 100%);
-            border: 1px solid var(--secondary-color); padding: 40px; border-radius: 2px;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            position: relative; z-index: 2; backdrop-filter: blur(5px); transition: 0.4s;
-        }
-        .feature-card:hover { box-shadow: 0 0 30px rgba(189, 0, 255, 0.3); border-color: var(--primary-color); transform: scale(1.01); }
-        .feature-icon { font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; text-shadow: 0 0 20px var(--secondary-color); }
-        .feature-card:hover .feature-icon { color: var(--primary-color); text-shadow: 0 0 20px var(--primary-color); }
-
-        /* Game */
-        #game { align-items: center; }
-        #ide-window { width: 100%; max-width: 960px; height: 600px; background: #1e1f22; border-radius: 4px; box-shadow: 0 0 20px rgba(0, 255, 242, 0.3), 0 0 40px rgba(189, 0, 255, 0.2), inset 0 0 50px rgba(0,0,0,0.8); display: flex; flex-direction: column; position: relative; overflow: hidden; border: 2px solid #333; border-image: linear-gradient(to bottom, var(--primary-color), var(--secondary-color)) 1; font-family: 'JetBrains Mono', monospace; z-index: 10; }
-        .crt-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 255, 242, 0.05) 50%); background-size: 100% 3px; z-index: 50; pointer-events: none; opacity: 0.8; box-shadow: inset 0 0 100px rgba(0,0,0,0.8); }
-        .glitch-active { animation: game-shake 0.2s infinite; filter: hue-rotate(90deg) contrast(1.5) drop-shadow(5px 0 0 red) drop-shadow(-5px 0 0 blue); }
-        @keyframes game-shake { 0% { transform: translate(0) } 25% { transform: translate(-4px, 4px) } 50% { transform: translate(4px, -4px) } 75% { transform: translate(-4px, -4px) } 100% { transform: translate(0) } }
-        .toolbar { height: 40px; background: #151518; border-bottom: 1px solid #333; display: flex; align-items: center; padding: 0 15px; gap: 15px; flex-shrink: 0; }
-        .file-tab { background: #1e1f22; padding: 8px 20px; border-top: 3px solid var(--primary-color); font-size: 13px; display: flex; align-items: center; gap: 8px; color: #fff; box-shadow: 0 -5px 10px rgba(0, 255, 242, 0.2); }
-        #game-container { position: relative; flex: 1; overflow: hidden; background: #1e1f22; min-height: 0; }
-        canvas { display: block; width: 100%; height: 100%; }
-        .hud { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; pointer-events: none; z-index: 20; text-shadow: 0 0 5px black;}
-        .score-box { font-size: 18px; font-weight: 800; color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color); }
-        #boss-hud { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 60%; display: none; flex-direction: column; align-items: center; z-index: 20; }
-        .boss-name { color: var(--danger-color); font-weight: bold; font-size: 20px; margin-bottom: 5px; text-shadow: 0 0 10px var(--danger-color), 0 0 20px var(--danger-color); }
-        .boss-hp-track { width: 100%; height: 12px; background: #111; border: 2px solid #333; border-radius: 0px; overflow: hidden; box-shadow: 0 0 10px var(--danger-color); }
-        .boss-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, var(--danger-color), #ff5e00); transition: width 0.1s; }
-        .player-stats { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-        .hp-bar { width: 200px; height: 8px; background: #111; margin-top: 5px; border-radius: 0px; overflow: hidden; border: 1px solid #333; box-shadow: 0 0 5px var(--string-green);}
-        .hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, var(--string-green), var(--primary-color)); transition: width 0.2s; }
-        .buff-tag { font-weight: bold; display: none; font-size: 14px; animation: pulse 0.5s infinite alternate; text-shadow: 0 0 10px currentColor; }
-        .buff-sudo { color: var(--gold); } .buff-shield { color: var(--shield-cyan); }
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 20, 25, 0.95); z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .screen h1 { font-size: 48px; color: var(--primary-color); margin-bottom: 10px; text-align: center; text-shadow: 0 0 20px var(--primary-color); }
-        .screen h1 span { color: var(--danger-color); text-shadow: 0 0 20px var(--danger-color); }
-        .game-btn { background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 12px 30px; font-family: 'JetBrains Mono'; font-size: 16px; cursor: pointer; border-radius: 0px; font-weight: bold; margin-top: 20px; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0, 255, 242, 0.2); }
-        .game-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0, 255, 242, 0.8), transparent); transition: 0.5s; }
-        .game-btn:hover { background: var(--primary-color); color: #000; box-shadow: 0 0 30px var(--primary-color), 0 0 60px var(--primary-color); }
-        .game-btn:hover::before { left: 100%; }
-        .controls-hint { color: #aaa; font-size: 12px; margin-top: 20px; display: grid; grid-template-columns: auto auto; gap: 10px 30px; }
-        .key { display: inline-block; border: 1px solid var(--primary-color); padding: 4px 8px; border-radius: 0px; color: var(--primary-color); font-size: 10px; background: rgba(0, 255, 242, 0.1); box-shadow: 0 0 5px var(--primary-color); }
-        .terminal { height: 120px; background: #151518; border-top: 1px solid #333; padding: 10px; font-size: 12px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; color: #aaa; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .log-item { margin-bottom: 4px; }
-        .log-item.err { color: var(--danger-color); text-shadow: 0 0 5px var(--danger-color); } .log-item.warn { color: var(--gold); text-shadow: 0 0 5px var(--gold); } .log-item.info { color: var(--string-green); text-shadow: 0 0 5px var(--string-green); }
-        #warning-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger-color); opacity: 0; pointer-events: none; z-index: 25; mix-blend-mode: overlay; }
-        @keyframes warning-pulse { 0% { opacity: 0; } 50% { opacity: 0.8; } 100% { opacity: 0; } }
-        
-        /* Footer */
-        footer { text-align: center; padding: 80px 0 50px 0; color: #888; background: #050508; border-top: 1px solid #222; position: relative; z-index: 2; }
-        .social-links { margin-top: 20px; font-size: 1.5rem; display: flex; justify-content: center; gap: 25px; }
-        .social-links a { color: #666; transition: 0.3s; }
-        .social-links a:hover { color: var(--primary-color); text-shadow: 0 0 15px var(--primary-color); transform: scale(1.2); }
-        .system-time { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #666; margin-bottom: 10px; letter-spacing: 1px; }
-        .konami-hint { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #333; margin-top: 40px; letter-spacing: 1px; user-select: none; }
-        .konami-hint:hover { color: #555; }
-
-        /* --- FLOATING DONATE WIDGET (DESKTOP) --- */
-        .fuel-widget {
-            position: fixed; bottom: 30px; right: 30px; z-index: 999;
-            display: flex; align-items: center; gap: 10px;
-            /* High Visibility */
-            background: rgba(10, 10, 15, 0.9); backdrop-filter: blur(10px);
-            border: 1px solid var(--primary-color); border-radius: 30px; padding: 8px 8px 8px 20px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden; max-width: 140px;
-            box-shadow: 0 0 15px rgba(0, 255, 242, 0.2), inset 0 0 20px rgba(0, 255, 242, 0.05);
-            animation: signalRipple 3s infinite;
-        }
-
-        @keyframes signalRipple { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 242, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 242, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 242, 0); } }
-        
-        .fuel-widget:hover { max-width: 320px; border-color: var(--primary-color); box-shadow: 0 0 30px rgba(0, 255, 242, 0.4); animation: none; }
-
-        .fuel-status {
-            font-family: 'JetBrains Mono'; font-size: 0.85rem; font-weight: bold;
-            color: #fff; white-space: nowrap;
-            display: flex; align-items: center; gap: 8px;
-            text-shadow: 0 0 5px rgba(0, 255, 242, 0.5);
-        }
-        .fuel-status i { color: var(--danger-color); animation: flashRed 1.5s infinite; }
-        @keyframes flashRed { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        
-        .fuel-actions { display: flex; gap: 5px; opacity: 0; transform: translateX(20px); transition: 0.3s ease 0.1s; }
-        .fuel-widget:hover .fuel-actions { opacity: 1; transform: translateX(0); }
-
-        .fuel-btn {
-            width: 35px; height: 35px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: #222; color: #fff; transition: 0.3s;
-            border: 1px solid #444;
-        }
-        .fuel-btn:hover { transform: scale(1.1); }
-        .fuel-btn.paypal:hover { background: #00fff2; color: #000; box-shadow: 0 0 15px #00fff2; border-color: #00fff2; }
-        .fuel-btn.kofi:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px #ff0055; border-color: #ff0055; }
-
-        /* --- MOBILE DONATE (FOOTER) --- */
-        .mobile-donate-container { display: none; } /* Hidden on desktop */
-
-        @media (max-width: 768px) {
-            .hero-content { flex-direction: column-reverse; text-align: center; }
-            .hero-text h1 { font-size: 2.2rem; }
-            .hamburger { display: block; margin-right: 20px;}
-            .nav-links {
-                position: absolute; right: 0; height: 100vh; top: 0;
-                background-color: rgba(10, 10, 15, 0.98); border-left: 2px solid var(--primary-color);
-                display: flex; flex-direction: column; align-items: center; justify-content: center;
-                width: 70%; transform: translateX(100%); transition: transform 0.4s ease-in-out;
-                z-index: 1001;
-            }
-            .nav-links.nav-active { transform: translateX(0%); box-shadow: -10px 0 30px rgba(0, 255, 242, 0.2); }
-            .nav-links li { opacity: 0; margin: 20px 0; }
-            .nav-links.nav-active li { animation: navLinkFade 0.5s ease forwards 0.3s; }
-            #ide-window { height: 400px; }
-            .boss-name { font-size: 14px; }
-            
-            /* Mobile Optimization */
-            * { cursor: auto; }
-            #cursor-dot, #cursor-ring { display: none; }
-            
-            /* Hide Floating Widget */
-            .fuel-widget { display: none; }
-
-            /* Show Footer Donate Panel */
-            .mobile-donate-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 40px; padding-top: 30px; border-top: 1px dashed #333; width: 100%; }
-            .mobile-fuel-label { font-family: 'JetBrains Mono'; font-size: 0.9rem; color: var(--secondary-color); letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 5px rgba(189, 0, 255, 0.5); margin-bottom: 10px; }
-            .mobile-donate-btns { display: flex; gap: 25px; }
-            .mob-btn { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #111; color: #888; border: 1px solid #444; font-size: 1.4rem; transition: 0.3s; }
-            .mob-btn.paypal:hover, .mob-btn.paypal:active { color: #00fff2; border-color: #00fff2; box-shadow: 0 0 20px rgba(0, 255, 242, 0.3); }
-            .mob-btn.kofi:hover, .mob-btn.kofi:active { color: #ff0055; border-color: #ff0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); }
-        }
-        @keyframes navLinkFade { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div id="preloader">
-        <div class="loader-text">> SYSTEM BOOT_SEQUENCE_INIT...</div>
-        <div class="loader-bar"><div class="loader-progress"></div></div>
+<div id="preloader">
+    <div class="loader-text">> SYSTEM BOOT_SEQUENCE_INIT...</div>
+    <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<canvas id="matrix-canvas"></canvas>
+
+<audio id="bgm" loop>
+    <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+<audio id="sfx-hover">
+    <source src="hover.mp3" type="audio/mpeg">
+</audio>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<div class="fuel-widget">
+    <div class="fuel-status">
+        <i class="fas fa-bolt"></i> <span data-i18n="fuel_status">RECHARGE</span>
+    </div>
+    <div class="fuel-actions">
+        <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="fuel-btn paypal" title="PayPal"><i class="fab fa-paypal"></i></a>
+        <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="fuel-btn kofi" title="Ko-fi"><i class="fas fa-mug-hot"></i></a>
+    </div>
+</div>
+
+<div class="nav-overlay"></div>
+
+<div id="cyber-grid"></div>
+<div id="particles-js"></div>
+
+<nav>
+    <div class="logo"><span>&lt;</span>Phil<span>/&gt;</span></div>
+    <div class="hamburger"><i class="fas fa-bars"></i></div>
+    <ul class="nav-links">
+        <li><a href="#hero" class="nav-item" data-i18n="nav_home">Start</a></li>
+        <li><a href="#about" class="nav-item" data-i18n="nav_about">Profile</a></li>
+        <li><a href="#projects" class="nav-item" data-i18n="nav_work">Work</a></li>
+        <li><a href="#plugins" class="nav-item" data-i18n="nav_plugins">Plugins</a></li>
+        <li><a href="#game" class="nav-item" style="color:var(--danger-color); text-shadow: 0 0 10px var(--danger-color);" data-i18n="nav_game">Merge Hell</a></li>
+        <li><button class="lang-switch" onclick="toggleLanguage()">EN/中</button></li>
+        <li><button class="audio-toggle" onclick="toggleAudio()"><i class="fas fa-volume-mute"></i></button></li>
+    </ul>
+</nav>
+
+<section id="hero">
+    <div class="hero-content">
+        <div class="hero-text" data-aos="fade-right">
+            <h3 style="color: var(--primary-color); letter-spacing: 2px;" data-i18n="hero_intro">// Hello World, I am</h3>
+            <h1 class="glitch" data-text="Mingzhe (Phil) Zhang">Mingzhe (Phil) Zhang</h1>
+            <h2 style="color: var(--secondary-color); margin-top: 10px; text-shadow: 0 0 10px var(--secondary-color);"><span id="typed-text"></span></h2>
+            <p style="margin-top: 20px; max-width: 500px; position:relative; z-index:2; color: #ccc;" data-i18n="hero_desc">
+                Crafting robust backend systems and navigating through complex architectures in the digital frontier.
+            </p>
+            <br>
+            <a href="#about" class="game-btn" style="text-decoration: none; font-size: 0.9rem; display: inline-block;">
+                <span data-i18n="hero_btn">View Profile</span> <i class="fas fa-arrow-down"></i>
+            </a>
+        </div>
+
+        <div class="avatar-box" data-aos="zoom-in">
+            <img src="p11_compressed.jpg" alt="Phil Base" class="img-base">
+            <img src="p12-compressed.png" alt="Phil Cyber" class="img-hover">
+        </div>
+    </div>
+</section>
+
+<section id="about">
+    <div class="section-title" data-aos="fade-up" data-i18n="about_title">System Stats</div>
+    <div class="grid">
+        <div class="card" data-aos="fade-up" data-aos-delay="100">
+            <h3><i class="fas fa-user-secret"></i> <span data-i18n="profile_title">Profile</span></h3>
+            <p style="margin-top: 15px; font-size: 0.95rem; color: #ccc;">
+                <strong style="color: var(--primary-color)" data-i18n="label_role">Role:</strong> <span data-i18n="val_role">Senior Software Engineer</span><br>
+                <strong style="color: var(--primary-color)" data-i18n="label_edu">Education:</strong> <span data-i18n="val_edu">MSc Computer Science, Univ. of Leicester</span><br>
+                <strong style="color: var(--primary-color)" data-i18n="label_focus">Focus:</strong> <span data-i18n="val_focus">High-performance Backend, Cloud Architecture</span><br>
+                <strong style="color: var(--primary-color)" data-i18n="label_curr">Current:</strong> <span data-i18n="val_curr">Fortune 500 Financial Institution</span>
+            </p>
+        </div>
+        <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <h3><i class="fas fa-code"></i> <span data-i18n="stack_title">Tech Stack</span></h3>
+            <div style="margin-top: 15px;">
+                <span class="skill-tag">Java Expert</span>
+                <span class="skill-tag">Spring Boot</span>
+                <span class="skill-tag">Microservices</span>
+                <span class="skill-tag">Kafka/ActiveMQ</span>
+                <span class="skill-tag">Docker/K8s</span>
+                <span class="skill-tag">Oracle/SQL</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="projects">
+    <div class="section-title" data-aos="fade-up" data-i18n="projects_title">Deployed Builds</div>
+    <div class="grid">
+        <div class="card" data-aos="zoom-in" data-aos-delay="100">
+            <h3 data-i18n="p1_title"><i class="fas fa-server"></i> Enterprise Monitor</h3>
+            <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p1_client">Fortune 500 Finance Firm</p>
+            <p style="color: #ccc;" data-i18n="p1_desc">Engineered a critical file monitoring system handling massive data flow. Led the migration to HDFS and optimized SLA alerting mechanisms.</p>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Java, Spring, ActiveMQ]</div>
+        </div>
+
+        <div class="card" data-aos="zoom-in" data-aos-delay="200">
+            <h3 data-i18n="p2_title"><i class="fas fa-database"></i> Unified Data Platform</h3>
+            <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p2_client">Risk & Compliance Dept</p>
+            <p style="color: #ccc;" data-i18n="p2_desc">Developed the 'Reference Data Service' module. Implemented Git-based version control for business data, ensuring auditability and safe rollback.</p>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Guice, JGit, Groovy]</div>
+        </div>
+
+        <div class="card" data-aos="zoom-in" data-aos-delay="300">
+            <h3 data-i18n="p3_title"><i class="fas fa-shield-alt"></i> Core Insurance System</h3>
+            <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p3_client">Global Tech Firm</p>
+            <p style="color: #ccc;" data-i18n="p3_desc">Customized a next-gen insurance administration solution. Bridged technical requirements between Shanghai and US teams, optimizing the base architecture.</p>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[SOA, Hibernate, Web Services]</div>
+        </div>
+    </div>
+</section>
+
+<section id="plugins">
+    <div class="section-title" data-aos="fade-up" data-i18n="plugins_title">Neural Extensions</div>
+    <div class="centered-container" data-aos="zoom-in">
+        <div class="feature-card">
+            <i class="fas fa-puzzle-piece feature-icon"></i>
+            <h3 style="color: var(--primary-color); margin-bottom: 15px;" data-i18n="pl_title">IntelliJ IDEA Plugins</h3>
+            <p style="color: #ccc; margin-bottom: 20px;" data-i18n="pl_desc">Enhancing developer productivity with custom tools and utilities for the JetBrains ecosystem.</p>
+            <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank" class="game-btn" style="font-size: 0.8rem;">
+                <span data-i18n="pl_btn">Visit Vendor Profile</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="game">
+    <div style="text-align: center; margin-bottom: 20px;" data-aos="fade-up">
+        <p style="color: var(--primary-color); font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 1px;" data-i18n="game_warning">> SYSTEM OVERLOAD. INITIATING SEQUENCE...</p>
+    </div>
+    <div class="section-title" data-aos="fade-up" style="text-shadow: 0 0 20px var(--danger-color);"><span data-i18n="game_break">Break Time:</span> <span style="color:var(--danger-color)">Merge Hell</span></div>
+
+    <div id="ide-window" data-aos="zoom-in">
+        <div class="crt-overlay"></div>
+        <div class="toolbar">
+            <div class="file-tab"><i class="fas fa-coffee" style="margin-right:8px"></i> BossBattle.java</div>
+            <div style="flex: 1"></div>
+            <div style="color: #666; font-size: 12px;">git: master*</div>
+            <div style="color: #666; font-size: 12px; margin-left:15px;">UTF-8</div>
+        </div>
+
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+            <div id="warning-flash"></div>
+
+            <div class="hud">
+                <div class="score-box">
+                    <div><span data-i18n="hud_lines">Lines:</span> <span id="score-val">0</span></div>
+                    <div id="level-name" style="font-size:14px; color:#aaa;">LEVEL 1: Merge Hell</div>
+                </div>
+                <div class="player-stats">
+                    <div class="buff-container">
+                        <div class="buff-tag buff-sudo" id="sudo-tag">⚡ SUDO MODE</div>
+                        <div class="buff-tag buff-shield" id="shield-tag">🛡️ FINAL SHIELD</div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--primary-color);">INTEGRITY</div>
+                    <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
+                </div>
+            </div>
+
+            <div id="boss-hud">
+                <div class="boss-name" id="boss-name">⚠️ LEGACY CODE MONSTROSITY</div>
+                <div class="boss-hp-track"><div class="boss-hp-fill" id="boss-hp"></div></div>
+            </div>
+
+            <div id="start-screen" class="screen">
+                <h1>Escape <span>Merge Hell</span> v4.2</h1>
+                <p style="color: var(--primary-color); font-family:'JetBrains Mono'; letter-spacing: 1px;" data-i18n="game_desc">> Avoid Bugs. Commit Fixes. Defeat Legacy Code.</p>
+
+                <div class="controls-hint">
+                    <div><span class="key">←</span> <span class="key">→</span> <span data-i18n="key_move">Move</span></div>
+                    <div><span class="key">SPACE</span> <span data-i18n="key_jump">Jump</span></div>
+                    <div><span class="key">C</span> <span data-i18n="key_shoot">Shoot (Commit)</span></div>
+                </div>
+
+                <button id="start-btn" class="game-btn" data-i18n="btn_run">Run 'Main'</button>
+            </div>
+
+            <div id="game-over-screen" class="screen" style="display: none;">
+                <h1 id="go-title" data-i18n="go_title">BUILD FAILED</h1>
+                <p id="go-reason" style="color: var(--danger-color); margin-bottom: 20px; text-shadow: 0 0 10px var(--danger-color);">NullPointerException</p>
+                <div style="margin-bottom: 30px; font-size: 20px; color: white;"><span data-i18n="go_score">Final Score:</span> <span id="final-score">0</span></div>
+                <button id="restart-btn" class="game-btn" data-i18n="btn_rebuild">Rebuild Project</button>
+            </div>
+
+            <div id="level-clear-screen" class="screen" style="display: none;">
+                <h1 id="lc-title" style="color: var(--string-green); text-shadow: 0 0 20px var(--string-green);" data-i18n="lc_title">LEVEL COMPLETE</h1>
+                <p id="lc-msg" style="color: white; font-size: 18px; text-align:center; padding:0 20px;">Module Refactored. Preparing Next Stage...</p>
+            </div>
+        </div>
+
+        <div class="terminal" id="terminal">
+            <div class="log-item info">[SYS] IDE Initialized. Waiting for user input...</div>
+        </div>
+    </div>
+</section>
+
+<div id="terminal-overlay" class="hidden">
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <span class="btn-dot red"></span>
+            <span class="btn-dot yellow"></span>
+            <span class="btn-dot green"></span>
+            <span class="terminal-title">root@phil-server: ~ (zsh)</span>
+        </div>
+        <div class="terminal-body" id="terminal-content">
+            <div class="output-line">Welcome to Phil's Terminal v1.0.</div>
+            <div class="output-line">Type <span class="cmd-highlight">'help'</span> to see available commands.</div>
+            <br>
+        </div>
+        <div class="input-area">
+            <span class="prompt-user">root@phil:~$</span>
+            <input type="text" id="cli-input" autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+    <div class="terminal-hint">Press <span class="key-tag">ESC</span> or <span class="key-tag">~</span> to close</div>
+</div>
+
+<footer>
+    <div class="system-time" id="local-time">SYS_TIME: --:--:--</div>
+    <p>Phil's Portfolio. <span style="color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color);" data-i18n="footer_text">No Bugs, Just Features.</span></p>
+
+    <div class="social-links">
+        <a href="mailto:bigphil.zhang@qq.com" target="_blank"><i class="fas fa-envelope"></i></a>
+        <a href="https://github.com/rainism0329" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank"><i class="fas fa-puzzle-piece"></i></a>
     </div>
 
-    <canvas id="matrix-canvas"></canvas>
-
-    <audio id="bgm" loop>
-        <source src="bgm.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="sfx-hover">
-        <source src="hover.mp3" type="audio/mpeg">
-    </audio>
-
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring"></div>
-
-    <div class="fuel-widget">
-        <div class="fuel-status">
-            <i class="fas fa-bolt"></i> <span data-i18n="fuel_status">RECHARGE</span>
-        </div>
-        <div class="fuel-actions">
-            <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="fuel-btn paypal" title="PayPal"><i class="fab fa-paypal"></i></a>
-            <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="fuel-btn kofi" title="Ko-fi"><i class="fas fa-mug-hot"></i></a>
+    <div class="mobile-donate-container">
+        <p class="mobile-fuel-label" data-i18n="mob_donate_label">>>> MOBILE RECHARGE UNIT</p>
+        <div class="mobile-donate-btns">
+            <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="mob-btn paypal"><i class="fab fa-paypal"></i></a>
+            <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="mob-btn kofi"><i class="fas fa-mug-hot"></i></a>
         </div>
     </div>
 
-    <div class="nav-overlay"></div>
+    <div class="terminal-hint-footer">
+        <span class="blink-symbol">>_</span> SYSTEM_ROOT: PRESS <span class="key-highlight">['~']</span> TO ACCESS
+    </div>
 
-    <div id="cyber-grid"></div>
-    <div id="particles-js"></div>
+    <div class="konami-hint">// KONAMI: ⬆⬆⬇⬇⬅➡⬅➡BA</div>
+</footer>
 
-    <nav>
-        <div class="logo"><span>&lt;</span>Phil<span>/&gt;</span></div>
-        <div class="hamburger"><i class="fas fa-bars"></i></div>
-        <ul class="nav-links">
-            <li><a href="#hero" class="nav-item" data-i18n="nav_home">Start</a></li>
-            <li><a href="#about" class="nav-item" data-i18n="nav_about">Profile</a></li>
-            <li><a href="#projects" class="nav-item" data-i18n="nav_work">Work</a></li>
-            <li><a href="#plugins" class="nav-item" data-i18n="nav_plugins">Plugins</a></li>
-            <li><a href="#game" class="nav-item" style="color:var(--danger-color); text-shadow: 0 0 10px var(--danger-color);" data-i18n="nav_game">Merge Hell</a></li>
-            <li><button class="lang-switch" onclick="toggleLanguage()">EN/中</button></li>
-            <li><button class="audio-toggle" onclick="toggleAudio()"><i class="fas fa-volume-mute"></i></button></li>
-        </ul>
-    </nav>
+<script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
-    <section id="hero">
-        <div class="hero-content">
-            <div class="hero-text" data-aos="fade-right">
-                <h3 style="color: var(--primary-color); letter-spacing: 2px;" data-i18n="hero_intro">// Hello World, I am</h3>
-                <h1 class="glitch" data-text="Mingzhe (Phil) Zhang">Mingzhe (Phil) Zhang</h1>
-                <h2 style="color: var(--secondary-color); margin-top: 10px; text-shadow: 0 0 10px var(--secondary-color);"><span id="typed-text"></span></h2>
-                <p style="margin-top: 20px; max-width: 500px; position:relative; z-index:2; color: #ccc;" data-i18n="hero_desc">
-                    Crafting robust backend systems and navigating through complex architectures in the digital frontier.
-                </p>
-                <br>
-                <a href="#about" class="game-btn" style="text-decoration: none; font-size: 0.9rem; display: inline-block;">
-                    <span data-i18n="hero_btn">View Profile</span> <i class="fas fa-arrow-down"></i>
-                </a>
-            </div>
-            
-            <div class="avatar-box" data-aos="zoom-in">
-                <img src="p11_compressed.jpg" alt="Phil Base" class="img-base">
-                <img src="p12-compressed.png" alt="Phil Cyber" class="img-hover">
-            </div>
-        </div>
-    </section>
+<script src="js/game.js"></script>
+<script src="js/terminal.js"></script>
+<script src="js/main.js"></script>
 
-    <section id="about">
-        <div class="section-title" data-aos="fade-up" data-i18n="about_title">System Stats</div>
-        <div class="grid">
-            <div class="card" data-aos="fade-up" data-aos-delay="100">
-                <h3><i class="fas fa-user-secret"></i> <span data-i18n="profile_title">Profile</span></h3>
-                <p style="margin-top: 15px; font-size: 0.95rem; color: #ccc;">
-                    <strong style="color: var(--primary-color)" data-i18n="label_role">Role:</strong> <span data-i18n="val_role">Senior Software Engineer</span><br>
-                    <strong style="color: var(--primary-color)" data-i18n="label_edu">Education:</strong> <span data-i18n="val_edu">MSc Computer Science, Univ. of Leicester</span><br>
-                    <strong style="color: var(--primary-color)" data-i18n="label_focus">Focus:</strong> <span data-i18n="val_focus">High-performance Backend, Cloud Architecture</span><br>
-                    <strong style="color: var(--primary-color)" data-i18n="label_curr">Current:</strong> <span data-i18n="val_curr">Fortune 500 Financial Institution</span>
-                </p>
-            </div>
-            <div class="card" data-aos="fade-up" data-aos-delay="200">
-                <h3><i class="fas fa-code"></i> <span data-i18n="stack_title">Tech Stack</span></h3>
-                <div style="margin-top: 15px;">
-                    <span class="skill-tag">Java Expert</span>
-                    <span class="skill-tag">Spring Boot</span>
-                    <span class="skill-tag">Microservices</span>
-                    <span class="skill-tag">Kafka/ActiveMQ</span>
-                    <span class="skill-tag">Docker/K8s</span>
-                    <span class="skill-tag">Oracle/SQL</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="projects">
-        <div class="section-title" data-aos="fade-up" data-i18n="projects_title">Deployed Builds</div>
-        <div class="grid">
-            <div class="card" data-aos="zoom-in" data-aos-delay="100">
-                <h3 data-i18n="p1_title"><i class="fas fa-server"></i> Enterprise Monitor</h3>
-                <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p1_client">Fortune 500 Finance Firm</p>
-                <p style="color: #ccc;" data-i18n="p1_desc">Engineered a critical file monitoring system handling massive data flow. Led the migration to HDFS and optimized SLA alerting mechanisms.</p>
-                <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Java, Spring, ActiveMQ]</div>
-            </div>
-
-            <div class="card" data-aos="zoom-in" data-aos-delay="200">
-                <h3 data-i18n="p2_title"><i class="fas fa-database"></i> Unified Data Platform</h3>
-                <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p2_client">Risk & Compliance Dept</p>
-                <p style="color: #ccc;" data-i18n="p2_desc">Developed the 'Reference Data Service' module. Implemented Git-based version control for business data, ensuring auditability and safe rollback.</p>
-                <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[Guice, JGit, Groovy]</div>
-            </div>
-
-            <div class="card" data-aos="zoom-in" data-aos-delay="300">
-                <h3 data-i18n="p3_title"><i class="fas fa-shield-alt"></i> Core Insurance System</h3>
-                <p style="font-size: 0.9rem; margin: 10px 0; color: var(--secondary-color);" data-i18n="p3_client">Global Tech Firm</p>
-                <p style="color: #ccc;" data-i18n="p3_desc">Customized a next-gen insurance administration solution. Bridged technical requirements between Shanghai and US teams, optimizing the base architecture.</p>
-                <div style="margin-top: 10px; font-size: 0.8rem; color: var(--primary-color);" class="font-code">[SOA, Hibernate, Web Services]</div>
-            </div>
-        </div>
-    </section>
-
-    <section id="plugins">
-        <div class="section-title" data-aos="fade-up" data-i18n="plugins_title">Neural Extensions</div>
-        <div class="centered-container" data-aos="zoom-in">
-            <div class="feature-card">
-                <i class="fas fa-puzzle-piece feature-icon"></i>
-                <h3 style="color: var(--primary-color); margin-bottom: 15px;" data-i18n="pl_title">IntelliJ IDEA Plugins</h3>
-                <p style="color: #ccc; margin-bottom: 20px;" data-i18n="pl_desc">Enhancing developer productivity with custom tools and utilities for the JetBrains ecosystem.</p>
-                <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank" class="game-btn" style="font-size: 0.8rem;">
-                    <span data-i18n="pl_btn">Visit Vendor Profile</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section id="game">
-        <div style="text-align: center; margin-bottom: 20px;" data-aos="fade-up">
-            <p style="color: var(--primary-color); font-family: 'JetBrains Mono'; text-transform: uppercase; letter-spacing: 1px;" data-i18n="game_warning">> SYSTEM OVERLOAD. INITIATING SEQUENCE...</p>
-        </div>
-        <div class="section-title" data-aos="fade-up" style="text-shadow: 0 0 20px var(--danger-color);"><span data-i18n="game_break">Break Time:</span> <span style="color:var(--danger-color)">Merge Hell</span></div>
-        
-        <div id="ide-window" data-aos="zoom-in">
-            <div class="crt-overlay"></div> 
-            <div class="toolbar">
-                <div class="file-tab"><i class="fas fa-coffee" style="margin-right:8px"></i> BossBattle.java</div>
-                <div style="flex: 1"></div>
-                <div style="color: #666; font-size: 12px;">git: master*</div>
-                <div style="color: #666; font-size: 12px; margin-left:15px;">UTF-8</div>
-            </div>
-
-            <div id="game-container">
-                <canvas id="gameCanvas"></canvas>
-                <div id="warning-flash"></div>
-
-                <div class="hud">
-                    <div class="score-box">
-                        <div><span data-i18n="hud_lines">Lines:</span> <span id="score-val">0</span></div>
-                        <div id="level-name" style="font-size:14px; color:#aaa;">LEVEL 1: Merge Hell</div>
-                    </div>
-                    <div class="player-stats">
-                        <div class="buff-container">
-                            <div class="buff-tag buff-sudo" id="sudo-tag">⚡ SUDO MODE</div>
-                            <div class="buff-tag buff-shield" id="shield-tag">🛡️ FINAL SHIELD</div>
-                        </div>
-                        <div style="font-size: 10px; color: var(--primary-color);">INTEGRITY</div>
-                        <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
-                    </div>
-                </div>
-
-                <div id="boss-hud">
-                    <div class="boss-name" id="boss-name">⚠️ LEGACY CODE MONSTROSITY</div>
-                    <div class="boss-hp-track"><div class="boss-hp-fill" id="boss-hp"></div></div>
-                </div>
-
-                <div id="start-screen" class="screen">
-                    <h1>Escape <span>Merge Hell</span> v4.2</h1>
-                    <p style="color: var(--primary-color); font-family:'JetBrains Mono'; letter-spacing: 1px;" data-i18n="game_desc">> Avoid Bugs. Commit Fixes. Defeat Legacy Code.</p>
-                    
-                    <div class="controls-hint">
-                        <div><span class="key">←</span> <span class="key">→</span> <span data-i18n="key_move">Move</span></div>
-                        <div><span class="key">SPACE</span> <span data-i18n="key_jump">Jump</span></div>
-                        <div><span class="key">C</span> <span data-i18n="key_shoot">Shoot (Commit)</span></div>
-                    </div>
-
-                    <button id="start-btn" class="game-btn" data-i18n="btn_run">Run 'Main'</button>
-                </div>
-
-                <div id="game-over-screen" class="screen" style="display: none;">
-                    <h1 id="go-title" data-i18n="go_title">BUILD FAILED</h1>
-                    <p id="go-reason" style="color: var(--danger-color); margin-bottom: 20px; text-shadow: 0 0 10px var(--danger-color);">NullPointerException</p>
-                    <div style="margin-bottom: 30px; font-size: 20px; color: white;"><span data-i18n="go_score">Final Score:</span> <span id="final-score">0</span></div>
-                    <button id="restart-btn" class="game-btn" data-i18n="btn_rebuild">Rebuild Project</button>
-                </div>
-                
-                <div id="level-clear-screen" class="screen" style="display: none;">
-                    <h1 id="lc-title" style="color: var(--string-green); text-shadow: 0 0 20px var(--string-green);" data-i18n="lc_title">LEVEL COMPLETE</h1>
-                    <p id="lc-msg" style="color: white; font-size: 18px; text-align:center; padding:0 20px;">Module Refactored. Preparing Next Stage...</p>
-                </div>
-            </div>
-
-            <div class="terminal" id="terminal">
-                <div class="log-item info">[SYS] IDE Initialized. Waiting for user input...</div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="system-time" id="local-time">SYS_TIME: --:--:--</div>
-        <p>Phil's Portfolio. <span style="color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color);" data-i18n="footer_text">No Bugs, Just Features.</span></p>
-        <div class="social-links">
-             <a href="mailto:mzhe0329@hotmail.com" target="_blank"><i class="fas fa-envelope"></i></a>
-             <a href="https://github.com/rainism0329" target="_blank"><i class="fab fa-github"></i></a>
-             <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank"><i class="fas fa-puzzle-piece"></i></a>
-        </div>
-
-        <div class="mobile-donate-container">
-            <p class="mobile-fuel-label" data-i18n="mob_donate_label">>>> MOBILE RECHARGE UNIT</p>
-            <div class="mobile-donate-btns">
-                <a href="https://www.paypal.com/paypalme/bigphilzhang" target="_blank" class="mob-btn paypal"><i class="fab fa-paypal"></i></a>
-                <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="mob-btn kofi"><i class="fas fa-mug-hot"></i></a>
-            </div>
-        </div>
-        
-        <div class="konami-hint">// KONAMI: ⬆⬆⬇⬇⬅➡⬅➡BA</div>
-    </footer>
-
-    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
-    <script>
-        // --- PRELOADER LOGIC ---
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('preloader').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('preloader').style.display = 'none';
-                }, 500);
-            }, 2000);
-        });
-
-        // --- MOBILE NAV & SCROLL LOCK LOGIC ---
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        const links = document.querySelectorAll('.nav-links li a');
-        const navOverlay = document.querySelector('.nav-overlay');
-        const body = document.body;
-
-        function toggleMenu() {
-            navLinks.classList.toggle('nav-active');
-            navOverlay.classList.toggle('active');
-            body.classList.toggle('scroll-locked');
-        }
-
-        hamburger.addEventListener('click', toggleMenu);
-        navOverlay.addEventListener('click', toggleMenu);
-
-        links.forEach(link => {
-            link.addEventListener('click', () => {
-                if (navLinks.classList.contains('nav-active')) {
-                    toggleMenu();
-                }
-            });
-        });
-
-        // --- SCROLLSPY (NAV HIGHLIGHT) ---
-        const sections = document.querySelectorAll("section");
-        const navItems = document.querySelectorAll(".nav-links a.nav-item");
-
-        window.addEventListener("scroll", () => {
-            let current = "";
-            sections.forEach((section) => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 100) {
-                    current = section.getAttribute("id");
-                }
-            });
-
-            navItems.forEach((li) => {
-                li.classList.remove("active");
-                if (li.getAttribute("href").includes(current)) {
-                    li.classList.add("active");
-                }
-            });
-        });
-
-        // --- AUDIO SYSTEM ---
-        const bgm = document.getElementById('bgm');
-        const sfxHover = document.getElementById('sfx-hover');
-        const audioToggle = document.querySelector('.audio-toggle');
-        let isAudioPlaying = false;
-
-        bgm.volume = 0.3;
-        sfxHover.volume = 0.2;
-
-        function toggleAudio() {
-            if (isAudioPlaying) {
-                bgm.pause();
-                audioToggle.classList.remove('playing');
-                audioToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
-            } else {
-                bgm.play().catch(e => console.log("Interaction required"));
-                audioToggle.classList.add('playing');
-                audioToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
-            }
-            isAudioPlaying = !isAudioPlaying;
-        }
-
-        document.querySelectorAll('a, button, .card').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                if (isAudioPlaying) {
-                    sfxHover.currentTime = 0;
-                    sfxHover.play().catch(() => {});
-                }
-            });
-        });
-
-        // --- I18N TRANSLATIONS ---
-        const translations = {
-            en: {
-                nav_home: "Start", nav_about: "Profile", nav_work: "Work", nav_plugins: "Plugins", nav_game: "Merge Hell",
-                hero_intro: "// Hello World, I am",
-                hero_desc: "Crafting robust backend systems and navigating through complex architectures in the digital frontier.",
-                hero_btn: "View Profile",
-                about_title: "System Stats", profile_title: "Profile",
-                label_role: "Role:", val_role: "Senior Software Engineer",
-                label_edu: "Education:", val_edu: "MSc Computer Science, Univ. of Leicester",
-                label_focus: "Focus:", val_focus: "High-performance Backend, Cloud Architecture",
-                label_curr: "Current:", val_curr: "Fortune 500 Financial Institution",
-                stack_title: "Tech Stack",
-                projects_title: "Deployed Builds",
-                p1_title: "Enterprise Monitor", p1_client: "Fortune 500 Finance Firm",
-                p1_desc: "Engineered a critical file monitoring system handling massive data flow. Led the migration to HDFS and optimized SLA alerting mechanisms.",
-                p2_title: "Unified Data Platform", p2_client: "Risk & Compliance Dept",
-                p2_desc: "Developed the 'Reference Data Service' module. Implemented Git-based version control for business data, ensuring auditability and safe rollback.",
-                p3_title: "Core Insurance System", p3_client: "Global Tech Firm",
-                p3_desc: "Customized a next-gen insurance administration solution. Bridged technical requirements between Shanghai and US teams, optimizing the base architecture.",
-                plugins_title: "Neural Extensions",
-                pl_title: "IntelliJ IDEA Plugins",
-                pl_desc: "Enhancing developer productivity with custom tools and utilities for the JetBrains ecosystem.",
-                pl_btn: "Visit Vendor Profile",
-                game_warning: "> SYSTEM OVERLOAD. INITIATING SEQUENCE...",
-                game_break: "Break Time:",
-                game_desc: "> Avoid Bugs. Commit Fixes. Defeat Legacy Code.",
-                key_move: "Move", key_jump: "Jump", key_shoot: "Shoot (Commit)",
-                btn_run: "Run 'Main'", btn_rebuild: "Rebuild Project",
-                go_title: "BUILD FAILED", go_score: "Final Score:",
-                lc_title: "LEVEL COMPLETE",
-                hud_lines: "Lines:",
-                footer_text: "No Bugs, Just Features.",
-                fuel_status: "RECHARGE",
-                mob_donate_label: ">>> MOBILE RECHARGE UNIT",
-                typed_strings: ['Java Backend Expert', 'System Architect', 'Legacy Code Slayer']
-            },
-            zh: {
-                nav_home: "首页", nav_about: "简介", nav_work: "项目", nav_plugins: "插件", nav_game: "代码地狱",
-                hero_intro: "// 你好世界，我是",
-                hero_desc: "在数字前沿构建稳健的后端系统，驾驭复杂的架构设计。",
-                hero_btn: "查看详情",
-                about_title: "系统状态", profile_title: "个人档案",
-                label_role: "职位:", val_role: "高级软件工程师",
-                label_edu: "教育:", val_edu: "莱斯特大学 高级计算机科学硕士",
-                label_focus: "专注:", val_focus: "高性能后端, 云原生架构",
-                label_curr: "当前:", val_curr: "世界500强金融机构",
-                stack_title: "技术栈",
-                projects_title: "已部署项目",
-                p1_title: "企业级监控系统", p1_client: "世界500强金融企业",
-                p1_desc: "设计了处理海量数据流的核心文件监控系统。主导了向 HDFS 的迁移并优化了 SLA 警报机制。",
-                p2_title: "统一数据平台", p2_client: "风险与合规部门",
-                p2_desc: "开发了'参考数据服务'模块。实现了基于 Git 的业务数据版本控制，确保可审计性和安全回滚。",
-                p3_title: "核心保险系统", p3_client: "全球科技服务公司",
-                p3_desc: "定制开发下一代保险管理解决方案。衔接上海与美国团队的技术需求，优化底层架构。",
-                plugins_title: "神经扩展 (Plugins)",
-                pl_title: "IntelliJ IDEA 插件集",
-                pl_desc: "为 JetBrains 生态系统打造的自定义工具，旨在提升开发者的编码效率与体验。",
-                pl_btn: "访问开发者主页",
-                game_warning: "> 系统过载。启动防御序列...",
-                game_break: "休息一下:",
-                game_desc: "> 躲避 Bug。提交修复。击败祖传代码。",
-                key_move: "移动", key_jump: "跳跃", key_shoot: "射击 (Commit)",
-                btn_run: "运行 'Main'", btn_rebuild: "重新构建项目",
-                go_title: "构建失败", go_score: "最终得分:",
-                lc_title: "关卡完成",
-                hud_lines: "代码行数:",
-                footer_text: "没有 Bug，只有特性。",
-                fuel_status: "能量补给",
-                mob_donate_label: ">>> 移动端充能站",
-                typed_strings: ['Java 后端专家', '系统架构师', '祖传代码终结者']
-            }
-        };
-
-        let currentLang = localStorage.getItem('site_lang') || 'en';
-        let typedInstance = null;
-
-        function updateLanguage(lang) {
-            const t = translations[lang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) {
-                    if (el.classList.contains('donate-btn')) {
-                         const icon = el.querySelector('i');
-                         const span = el.querySelector('span');
-                         if(span) span.innerText = t[key];
-                    } else if (el.children.length > 0 && el.tagName !== 'BUTTON') {
-                        const icon = el.querySelector('i');
-                        el.innerText = t[key];
-                        if(icon) el.prepend(icon); 
-                    } else {
-                        el.innerText = t[key];
-                    }
-                }
-            });
-            if (typedInstance) typedInstance.destroy();
-            typedInstance = new Typed('#typed-text', {
-                strings: t.typed_strings,
-                typeSpeed: 50, backSpeed: 30, loop: true
-            });
-            localStorage.setItem('site_lang', lang);
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'zh' : 'en';
-            updateLanguage(currentLang);
-        }
-
-        // Initialize
-        AOS.init({ duration: 800, offset: 50 });
-        particlesJS("particles-js", {
-            "particles": { "number": { "value": 60 }, "color": { "value": ["#00fff2", "#bd00ff"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.6 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#45a29e", "opacity": 0.2, "width": 1 }, "move": { "enable": true, "speed": 1.5 } },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } } }
-        });
-        
-        updateLanguage(currentLang);
-
-        // --- MOUSE CURSOR ---
-        const cursorDot = document.getElementById("cursor-dot");
-        const cursorRing = document.getElementById("cursor-ring");
-        let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-        document.addEventListener("mousemove", (e) => { mouseX = e.clientX; mouseY = e.clientY; cursorDot.style.left = `${mouseX}px`; cursorDot.style.top = `${mouseY}px`; });
-        function animateCursor() { 
-            ringX += (mouseX - ringX) * 0.12; 
-            ringY += (mouseY - ringY) * 0.12; 
-            cursorRing.style.left = `${ringX}px`; 
-            cursorRing.style.top = `${ringY}px`; 
-            requestAnimationFrame(animateCursor); 
-        }
-        animateCursor();
-        document.addEventListener("mousedown", () => { document.body.classList.add("clicking"); });
-        document.addEventListener("mouseup", () => { document.body.classList.remove("clicking"); });
-        document.querySelectorAll("a, button, .card, .game-btn, .fuel-btn").forEach(link => { link.addEventListener("mouseenter", () => { document.body.classList.add("hover-link"); }); link.addEventListener("mouseleave", () => { document.body.classList.remove("hover-link"); }); });
-        const gameArea = document.getElementById("game");
-        gameArea.addEventListener("mouseenter", () => { document.body.classList.add("hover-danger"); });
-        gameArea.addEventListener("mouseleave", () => { document.body.classList.remove("hover-danger"); });
-
-        // --- GAME LOGIC ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const container = document.getElementById('game-container');
-        const ui = { score: document.getElementById('score-val'), playerHp: document.getElementById('player-hp'), bossHud: document.getElementById('boss-hud'), bossName: document.getElementById('boss-name'), bossHp: document.getElementById('boss-hp'), sudoTag: document.getElementById('sudo-tag'), shieldTag: document.getElementById('shield-tag'), terminal: document.getElementById('terminal'), levelName: document.getElementById('level-name'), screens: { start: document.getElementById('start-screen'), gameOver: document.getElementById('game-over-screen'), levelClear: document.getElementById('level-clear-screen') }, warning: document.getElementById('warning-flash') };
-        const CONFIG = { gravity: 0.5, jumpForce: -10, groundY: 400, playerSpeed: 5, bossApproachX: 200, colors: { player: '#00fff2', boss: '#ff0055', text: '#bcbec4', shield: '#8be9fd', string: '#50fa7b', gold: '#f1fa8c' } };
-        const LEVELS = [ { name: "Merge Hell", bg: '#1a1a1d', bossName: "⚠️ LEGACY CODE MONSTROSITY", bossHP: 2000, runDuration: 1000, enemyWeights: [{ type: 'conflict', weight: 4 }, { type: 'bug', weight: 5 }, { type: 'techdebt', weight: 1 }] }, { name: "Runtime Inferno", bg: '#2b1a1c', bossName: "💀 MEMORY LEAK DAEMON", bossHP: 3500, runDuration: 1500, enemyWeights: [{ type: 'crash', weight: 5 }, { type: 'lock', weight: 3 }, { type: 'bug', weight: 2 }] }, { name: "Final Frontier", bg: '#0f172a', bossName: "👑 THE ARCHITECT", bossHP: 5000, runDuration: 2000, enemyWeights: [{ type: 'firewall', weight: 4 }, { type: 'crash', weight: 2 }, { type: 'conflict', weight: 2 }, { type: 'techdebt', weight: 1 }] } ];
-        const input = { left: false, right: false, jump: false, shoot: false };
-        let gameLoopId = null;
-        let state = { mode: 'MENU', frames: 0, score: 0, shake: 0, level: 0, bossTriggerScore: 0, currentLevelConfig: LEVELS[0] };
-        function resize() { canvas.width = container.offsetWidth; canvas.height = container.offsetHeight; CONFIG.groundY = canvas.height - 50; if (player) player.y = Math.min(player.y, CONFIG.groundY - player.h); }
-        window.addEventListener('resize', resize);
-        function log(msg, type = 'info') { const div = document.createElement('div'); div.className = `log-item ${type}`; const time = new Date().toLocaleTimeString('en-US', {hour12:false}); div.innerText = `[${time}] ${msg}`; ui.terminal.prepend(div); if(ui.terminal.children.length > 20) ui.terminal.lastChild.remove(); }
-        class FloatingText { constructor(x, y, text, color) { this.x = x; this.y = y; this.text = text; this.color = color; this.life = 1.0; this.vy = -2; } update() { this.y += this.vy; this.life -= 0.03; } draw() { ctx.globalAlpha = Math.max(0, this.life); ctx.fillStyle = this.color; ctx.font = 'bold 16px Arial'; ctx.fillText(this.text, this.x, this.y); ctx.globalAlpha = 1; } }
-        class Player { constructor() { this.w = 30; this.h = 30; this.x = 100; this.y = CONFIG.groundY - 100; this.dy = 0; this.grounded = false; this.hp = 100; this.maxHp = 100; this.lastShot = 0; this.cooldown = 25; this.sudoMode = 0; this.shieldTime = 0; this.invincibleFrame = 0; } update() { if (input.left) this.x -= CONFIG.playerSpeed; if (input.right) this.x += CONFIG.playerSpeed; if (this.x < 0) this.x = 0; if (this.x > canvas.width - this.w) this.x = canvas.width - this.w; this.dy += CONFIG.gravity; this.y += this.dy; if (this.y + this.h > CONFIG.groundY) { this.y = CONFIG.groundY - this.h; this.dy = 0; this.grounded = true; } else { this.grounded = false; } if (input.jump && this.grounded) { this.dy = CONFIG.jumpForce; input.jump = false; } if (input.shoot) this.shoot(); if (this.invincibleFrame > 0) this.invincibleFrame--; this.cooldown = 25; if (this.sudoMode > 0) { this.sudoMode--; ui.sudoTag.style.display = 'block'; this.cooldown = 8; if(this.sudoMode === 0) { ui.sudoTag.style.display = 'none'; log("Sudo permissions expired.", "warn"); } } else { ui.sudoTag.style.display = 'none'; } if (this.shieldTime > 0) { this.shieldTime--; ui.shieldTag.style.display = 'block'; if(this.shieldTime === 0) { ui.shieldTag.style.display = 'none'; log("Final shield deprecated.", "warn"); } } else { ui.shieldTag.style.display = 'none'; } } shoot() { if (state.frames - this.lastShot >= this.cooldown) { this.lastShot = state.frames; const isSudo = this.sudoMode > 0; projectiles.push(new Projectile(this.x + this.w, this.y + this.h/2, isSudo ? 12 : 8, isSudo ? 'sudo' : 'commit')); } } takeDamage(amount) { if (this.shieldTime > 0 || this.invincibleFrame > 0) return; this.hp -= amount; this.invincibleFrame = 60; state.shake = 10; ui.playerHp.style.width = Math.max(0, (this.hp / this.maxHp * 100)) + '%'; container.parentElement.classList.add('glitch-active'); setTimeout(() => container.parentElement.classList.remove('glitch-active'), 200); if (this.hp <= 0) endGame("FATAL ERROR: Integrity Compromised"); } draw() { ctx.save(); ctx.translate(this.x, this.y); if (this.invincibleFrame > 0 && Math.floor(state.frames / 4) % 2 === 0) ctx.globalAlpha = 0.5; ctx.fillStyle = this.sudoMode > 0 ? CONFIG.colors.gold : CONFIG.colors.player; ctx.beginPath(); ctx.roundRect(0, 0, this.w, this.h, 5); ctx.fill(); ctx.fillStyle = '#000'; ctx.font = 'bold 20px JetBrains Mono'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('J', this.w/2, this.h/2); if (this.shieldTime > 0) { ctx.strokeStyle = CONFIG.colors.shield; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(this.w/2, this.h/2, 25 + Math.sin(state.frames * 0.2)*2, 0, Math.PI*2); ctx.stroke(); } ctx.restore(); } }
-        class Boss { constructor(config) { this.w = 120; this.h = 150; this.x = canvas.width + 200; this.y = 150; this.targetX = canvas.width - CONFIG.bossApproachX; this.hp = config.bossHP; this.maxHp = config.bossHP; this.active = false; this.floatOffset = 0; this.actionTimer = 0; this.symbol = config.bossName.split(' ')[0]; this.name = config.bossName; this.level = state.level; this.powerupTimer = 0; } activate() { this.active = true; ui.bossHud.style.display = 'flex'; log(`WARNING: ${this.name} HAS APPEARED!`, "err"); ui.warning.style.animation = "warning-pulse 1s 3"; } update() { if (!this.active) return; if (this.x > this.targetX) { this.x -= 2; } else { this.floatOffset += 0.03 + (this.level * 0.01); this.y = 150 + Math.sin(this.floatOffset) * 50; this.actionTimer++; const attackRate = Math.max(80, 150 - this.level * 20); if (this.actionTimer > attackRate) { this.attack(); this.actionTimer = 0; } this.powerupTimer++; if (this.powerupTimer > 400) { this.dropPowerup(); this.powerupTimer = 0; } } } dropPowerup() { const type = Math.random() > 0.5 ? 'powerup_sudo' : 'powerup_shield'; enemies.push(new Enemy(this.x, this.y + 100, type)); log("Boss dropped a leaked resource!", "info"); } attack() { if (this.level === 0) { const r = Math.random(); if (r < 0.3) enemies.push(new Enemy(this.x, CONFIG.groundY - 100, 'techdebt')); else if (r < 0.6) enemies.push(new Enemy(this.x, this.y + 75, 'null')); else enemies.push(new Enemy(this.x, CONFIG.groundY - 40, 'conflict')); } else if (this.level === 1) { if (Math.random() < 0.5) enemies.push(new Enemy(this.x, this.y + 50, 'crash')); else enemies.push(new Enemy(this.x, CONFIG.groundY - 40, 'lock')); } else if (this.level === 2) { if (Math.random() < 0.3) enemies.push(new Enemy(this.x, canvas.height/2, 'firewall')); else for(let i=0; i<3; i++) enemies.push(new Enemy(this.x, CONFIG.groundY - (i*50) - 40, 'crash')); } } takeDamage(amount) { if (!this.active) return; this.hp -= amount; ui.bossHp.style.width = Math.max(0, (this.hp / this.maxHp * 100)) + '%'; texts.push(new FloatingText(this.x + this.w/2 + (Math.random()-0.5)*50, this.y + this.h/2, "-" + amount, "#fff")); if (this.hp <= 0) this.die(); } die() { this.active = false; ui.bossHud.style.display = 'none'; createMegaExplosion(this.x + this.w/2, this.y + this.h/2, CONFIG.colors.boss); const nextLevel = state.level + 1; if (nextLevel < LEVELS.length) { state.mode = 'LEVEL_CLEAR'; log(`LEVEL ${nextLevel} UNLOCKED. Preparing next environment...`, "gold"); ui.screens.levelClear.style.display = 'flex'; document.getElementById('lc-msg').innerText = `Module ${state.level + 1} Refactored. Preparing Level ${nextLevel + 1}: ${LEVELS[nextLevel].name}...`; setTimeout(() => { state.level = nextLevel; startLevel(); }, 3000); } else { state.mode = 'VICTORY'; log("ALL REFACTORING COMPLETE. PROJECT DEPLOYED.", "gold"); setTimeout(() => endGame("TOTAL VICTORY: Project Deployed"), 3000); } } draw() { if (!this.active && this.x > canvas.width) return; ctx.save(); ctx.translate(this.x, this.y); ctx.fillStyle = CONFIG.colors.boss; ctx.fillRect(0, 0, 120, 150); ctx.fillStyle = '#000'; ctx.font = 'bold 80px JetBrains Mono'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(this.symbol, 60, 75); ctx.restore(); }
-        }
-        class Projectile { constructor(x, y, speed, type) { this.x = x; this.y = y; this.speed = speed; this.type = type; this.w = type === 'sudo' ? 60 : 30; this.h = type === 'sudo' ? 15 : 10; this.dead = false; this.damage = type === 'sudo' ? 80 : 20; } update() { this.x += this.speed; if (this.x > canvas.width) this.dead = true; } draw() { ctx.fillStyle = this.type === 'sudo' ? CONFIG.colors.gold : CONFIG.colors.string; ctx.font = this.type === 'sudo' ? 'bold 16px monospace' : '12px monospace'; ctx.fillText(this.type === 'sudo' ? 'rm -rf' : 'push', this.x, this.y); } }
-        class Enemy { constructor(x, y, type) { this.x = x; this.y = y; this.type = type; this.dead = false; this.initialY = y; this.frames = 0; this.w = 40; this.h = 40; this.vx = 3 + (state.level * 0.5); this.damage = 20; if (type === 'conflict' || type === 'techdebt' || type === 'lock') { this.y = CONFIG.groundY - 40; if (type === 'techdebt') this.y = CONFIG.groundY - 80; this.initialY = this.y; } if (type === 'firewall') this.y = 0; if (type === 'conflict') { this.color = '#cf8e6d'; this.symbol = '<<HEAD'; } else if (type === 'bug') { this.color = CONFIG.colors.boss; this.symbol = '🐛'; } else if (type === 'techdebt') { this.w = 60; this.h = 80; this.vx = 2; this.color = '#5c6370'; this.symbol = 'TODO'; this.damage = 30;} else if (type === 'crash') { this.w = 50; this.h = 50; this.vx = 5 + (state.level*1); this.color = '#ff9800'; this.symbol = '💥'; this.damage = 40; } else if (type === 'lock') { this.color = '#4caf50'; this.symbol = '🔒'; } else if (type === 'firewall') { this.w = 80; this.h = 150; this.vx = 1.5; this.color = '#1e88e5'; this.symbol = '🔥'; this.damage = 50;} else if (type === 'powerup_sudo') { this.color = CONFIG.colors.gold; this.symbol = '⚡'; this.w = 30; this.h = 30;} else if (type === 'powerup_shield') { this.color = CONFIG.colors.shield; this.symbol = '🛡️'; this.w = 30; this.h = 30;} } update() { this.frames++; this.x -= this.vx; if (this.type === 'lock') this.y = this.initialY + Math.sin(this.frames * 0.1) * 30; if (this.x + this.w < -100) this.dead = true; } draw() { ctx.save(); ctx.translate(this.x, this.y); if (this.type === 'firewall') { ctx.fillStyle = this.color; ctx.fillRect(0, 0, this.w, this.h); ctx.fillStyle = '#fff'; ctx.font = 'bold 20px monospace'; ctx.fillText('FIREWALL', 5, 20); } else if (this.type === 'techdebt') { ctx.fillStyle = this.color; ctx.fillRect(0, 0, this.w, this.h); ctx.fillStyle = '#fff'; ctx.font = '12px monospace'; ctx.fillText('//TODO', 5, 20); } else { ctx.fillStyle = this.color; ctx.font = '24px monospace'; ctx.fillText(this.symbol, 0, 24); } ctx.restore(); } }
-        class Particle { constructor(x, y, color, vx, vy, lifeDecay = 0.05) { this.x = x; this.y = y; this.vx = vx || (Math.random()-0.5) * 10; this.vy = vy || (Math.random()-0.5) * 10; this.life = 1.0; this.color = color; this.lifeDecay = lifeDecay; } update() { this.x += this.vx; this.y += this.vy; this.vy += 0.2; this.life -= this.lifeDecay; } draw() { ctx.globalAlpha = this.life; ctx.fillStyle = this.color; ctx.fillRect(this.x, this.y, 4, 4); ctx.globalAlpha = 1; } }
-        
-        let player = new Player(); let boss = new Boss(LEVELS[0]); let projectiles = [], enemies = [], particles = [], texts = [];
-        function createMegaExplosion(x, y, color) { ui.warning.style.backgroundColor = '#fff'; ui.warning.style.animation = "warning-pulse 0.2s 5"; setTimeout(() => { ui.warning.style.animation = 'none'; }, 1000); for(let i=0; i<300; i++) { const angle = Math.random() * Math.PI * 2; const speed = Math.random() * 15 + 5; particles.push(new Particle(x, y, i % 3 === 0 ? CONFIG.colors.gold : (i % 3 === 1 ? CONFIG.colors.player : color), Math.cos(angle) * speed, Math.sin(angle) * speed, 0.02 + Math.random()*0.01)); } state.shake = 30; }
-        function spawnManager() { const currentLevel = state.currentLevelConfig; if (state.score >= state.bossTriggerScore && state.mode === 'RUNNING') { state.mode = 'BOSS_WARNING'; log("ANOMALY DETECTED. STOPPING SCROLL...", "warn"); setTimeout(() => { state.mode = 'BOSS_FIGHT'; boss.activate(); }, 2000); return; } if (state.mode === 'RUNNING' && state.frames % 80 === 0) { let totalWeight = currentLevel.enemyWeights.reduce((sum, item) => sum + item.weight, 0); let random = Math.random() * totalWeight; let enemyType = 'bug'; for (const item of currentLevel.enemyWeights) { if (random < item.weight) { enemyType = item.type; break; } random -= item.weight; } const r = Math.random(); if (r < 0.04) enemies.push(new Enemy(canvas.width, CONFIG.groundY - 150, 'powerup_sudo')); else if (r < 0.08) enemies.push(new Enemy(canvas.width, CONFIG.groundY - 150, 'powerup_shield')); else enemies.push(new Enemy(canvas.width, CONFIG.groundY - 100 - Math.random()*100, enemyType)); } }
-        function checkCollisions() { const pRect = {x: player.x, y: player.y, w: player.w, h: player.h}; enemies.forEach(e => { if (e.dead) return; if (rectIntersect(pRect, {x: e.x, y: e.y, w: e.w, h: e.h})) { if (e.type.startsWith('powerup')) { e.dead = true; if (e.type === 'powerup_sudo') { player.sudoMode = 400; log("ROOT ACCESS GRANTED. UNLIMITED POWER.", "warn"); texts.push(new FloatingText(player.x, player.y - 20, "SUDO!", CONFIG.colors.gold)); } else if (e.type === 'powerup_shield') { player.shieldTime = 400; log("FINAL KEYWORD ADDED. IMMUTABLE.", "info"); texts.push(new FloatingText(player.x, player.y - 20, "SHIELD!", CONFIG.colors.shield)); } } else { if (player.shieldTime > 0) { e.dead = true; createExplosion(e.x, e.y, 5, CONFIG.colors.shield); } else { e.dead = true; player.takeDamage(e.damage); createExplosion(player.x, player.y, 10, '#fff'); } } } }); projectiles.forEach(p => { if (p.dead) return; const pRect = {x: p.x, y: p.y, w: p.w, h: p.h}; enemies.forEach(e => { if (e.dead || e.type.startsWith('powerup')) return; if (rectIntersect(pRect, {x: e.x, y: e.y, w: e.w, h: e.h})) { e.dead = true; state.score += 50; createExplosion(e.x, e.y, 5, e.color); if (p.type !== 'sudo') p.dead = true; } }); if (state.mode === 'BOSS_FIGHT' && boss.active) { if (rectIntersect(pRect, {x: boss.x, y: boss.y, w: boss.w, h: boss.h})) { p.dead = true; boss.takeDamage(p.damage); createExplosion(p.x, p.y, 3, '#fff'); } } }); }
-        function rectIntersect(r1, r2) { return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y); }
-        function createExplosion(x, y, count, color) { for(let i=0; i<count; i++) particles.push(new Particle(x, y, color)); }
-        function drawBackground() { ctx.fillStyle = state.currentLevelConfig.bg; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = 'rgba(0, 255, 242, 0.03)'; for(let i=0; i<canvas.height; i+=4) ctx.fillRect(0, i, canvas.width, 1); ctx.fillStyle = '#2b2d30'; ctx.font = '14px JetBrains Mono'; const offset = (state.frames * 1.5) % 200; const codes = ["public void suffer() {", "while(alive) {", "git push --force", "try { fix(); }", "catch (Exception e)"]; for(let i=0; i<canvas.height/30; i++) { for(let j=0; j<4; j++) { ctx.fillText(codes[i%codes.length], 50 + j*300 - offset, 50 + i*30); } } ctx.fillStyle = '#323232'; ctx.fillRect(0, CONFIG.groundY, canvas.width, canvas.height - CONFIG.groundY); ctx.strokeStyle = '#555'; ctx.beginPath(); ctx.moveTo(0, CONFIG.groundY); ctx.lineTo(canvas.width, CONFIG.groundY); ctx.stroke(); }
-        function loop() { if (['GAMEOVER', 'MENU', 'LEVEL_CLEAR', 'VICTORY'].includes(state.mode)) return; state.frames++; if (state.shake > 0) { ctx.save(); ctx.translate((Math.random()-0.5)*state.shake, (Math.random()-0.5)*state.shake); state.shake *= 0.9; if(state.shake < 0.5) state.shake = 0; } player.update(); if (state.mode === 'RUNNING') spawnManager(); if (state.mode === 'BOSS_FIGHT') boss.update(); enemies.forEach(e => e.update()); projectiles.forEach(p => p.update()); particles.forEach(p => p.update()); texts.forEach(t => t.update()); enemies = enemies.filter(e => !e.dead); projectiles = projectiles.filter(p => !p.dead); particles = particles.filter(p => p.life > 0); texts = texts.filter(t => t.life > 0); checkCollisions(); drawBackground(); player.draw(); boss.draw(); enemies.forEach(e => e.draw()); projectiles.forEach(p => p.draw()); particles.forEach(p => p.draw()); texts.forEach(t => t.draw()); if (state.mode === 'RUNNING') { state.score += 0.5; ui.score.innerText = Math.floor(state.score); } if (state.shake > 0) ctx.restore(); gameLoopId = requestAnimationFrame(loop); }
-        function startLevel() { Object.values(ui.screens).forEach(screen => screen.style.display = 'none'); ui.bossHud.style.display = 'none'; state.currentLevelConfig = LEVELS[state.level]; state.bossTriggerScore = state.score + state.currentLevelConfig.runDuration; player = new Player(); boss = new Boss(state.currentLevelConfig); enemies = []; projectiles = []; particles = []; texts = []; ui.playerHp.style.width = '100%'; ui.bossHp.style.width = '100%'; ui.levelName.innerText = `LEVEL ${state.level + 1}: ${state.currentLevelConfig.name}`; ui.bossName.innerText = state.currentLevelConfig.bossName; container.style.backgroundColor = state.currentLevelConfig.bg; log(`LEVEL ${state.level + 1}: ${state.currentLevelConfig.name} - Initializing...`, "sys"); state.mode = 'RUNNING'; resize(); if (gameLoopId) cancelAnimationFrame(gameLoopId); gameLoopId = requestAnimationFrame(loop); }
-        function startGame() { state.level = 0; state.frames = 0; state.score = 0; if (gameLoopId) cancelAnimationFrame(gameLoopId); gameLoopId = null; startLevel(); }
-        function endGame(reason) { state.mode = reason.includes("VICTORY") ? 'VICTORY' : 'GAMEOVER'; ui.screens.gameOver.style.display = 'flex'; document.getElementById('go-reason').innerText = reason; document.getElementById('final-score').innerText = Math.floor(state.score); const title = document.getElementById('go-title'); if (reason.includes("VICTORY")) { title.innerText = "PROJECT DEPLOYED"; title.style.color = CONFIG.colors.gold; document.getElementById('go-reason').style.color = CONFIG.colors.gold; } else { title.innerText = "BUILD FAILED"; title.style.color = CONFIG.colors.boss; document.getElementById('go-reason').style.color = CONFIG.colors.boss; } }
-        
-        window.addEventListener('keydown', e => { if(['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) e.preventDefault(); if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = true; if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = true; if (e.code === 'Space') { input.jump = true; if (['MENU', 'GAMEOVER', 'VICTORY'].includes(state.mode)) startGame(); } if (e.code === 'KeyC') input.shoot = true; });
-        window.addEventListener('keyup', e => { if (e.code === 'ArrowLeft' || e.code === 'KeyA') input.left = false; if (e.code === 'ArrowRight' || e.code === 'KeyD') input.right = false; if (e.code === 'Space') input.jump = false; if (e.code === 'KeyC') input.shoot = false; });
-        document.getElementById('start-btn').onclick = startGame;
-        document.getElementById('restart-btn').onclick = startGame;
-        resize();
-
-        // --- CONSOLE EASTER EGG & TITLE INTERACTION ---
-        const styleTitle = [
-            'font-size: 20px',
-            'font-weight: bold',
-            'font-family: monospace',
-            'color: #00fff2',
-            'text-shadow: 0 0 10px #00fff2',
-            'padding: 10px 0',
-        ].join(';');
-
-        const styleBody = [
-            'font-size: 12px',
-            'font-family: monospace',
-            'color: #bd00ff',
-        ].join(';');
-
-        console.log('%c⚡ SYSTEM READY // PHIL_PORTFOLIO_V10.0', styleTitle);
-        console.log('%c> Welcome to the backend. Looking for bugs? Good luck.', styleBody);
-        console.log('%c> Connect with me: https://github.com/rainism0329', styleBody);
-
-        let docTitle = document.title;
-        window.addEventListener("blur", () => {
-            document.title = "⚠ SIGNAL LOST // Come Back";
-        });
-        window.addEventListener("focus", () => {
-            document.title = docTitle;
-        });
-
-        // --- LIVE SYSTEM TIME ---
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour12: false }) + '.' + String(now.getMilliseconds()).padStart(3, '0');
-            document.getElementById('local-time').innerText = `SYS_TIME: ${timeString} [UTC+8]`; // Change UTC+8 to your timezone
-            requestAnimationFrame(updateTime);
-        }
-        updateTime();
-
-        // --- KONAMI CODE & MATRIX RAIN ---
-        const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
-        let konamiIndex = 0;
-        const matrixCanvas = document.getElementById('matrix-canvas');
-        const mCtx = matrixCanvas.getContext('2d');
-        let matrixInterval;
-
-        // --- 1. Listen for Keydown (Konami Code + Escape) ---
-        window.addEventListener('keydown', (e) => {
-            // ESC to exit Matrix Mode
-            if (e.code === 'Escape' && matrixCanvas.classList.contains('active')) {
-                deactivateMatrix();
-            }
-
-            // Check Konami sequence
-            if (e.code === konamiCode[konamiIndex]) {
-                konamiIndex++;
-                if (konamiIndex === konamiCode.length) {
-                    activateMatrix();
-                    konamiIndex = 0;
-                }
-            } else {
-                konamiIndex = 0;
-            }
-        });
-
-        // --- 2. Handle Window Resize for Matrix Canvas ---
-        window.addEventListener('resize', () => {
-            if (matrixCanvas.classList.contains('active')) {
-                // Reset canvas dimensions
-                matrixCanvas.width = window.innerWidth;
-                matrixCanvas.height = window.innerHeight;
-                // Re-initialize drops array for new width
-                const fontSize = 16;
-                const columns = matrixCanvas.width / fontSize;
-                // We need to reset drops or extend it
-                // Simpler to restart the effect cleanly
-                if (matrixInterval) clearInterval(matrixInterval);
-                startMatrixAnimation(fontSize);
-            }
-        });
-
-        function activateMatrix() {
-            if (matrixCanvas.classList.contains('active')) return;
-            
-            console.log('%c>>> MATRIX MODE ACTIVATED <<<', 'color:#0f0; font-size:20px; font-weight:bold;');
-            // Optional: alert("ACCESS GRANTED"); 
-            
-            matrixCanvas.classList.add('active');
-            matrixCanvas.width = window.innerWidth;
-            matrixCanvas.height = window.innerHeight;
-            
-            const fontSize = 16;
-            startMatrixAnimation(fontSize);
-
-            // Play BGM if not already playing
-            const bgm = document.getElementById('bgm');
-            if(bgm.paused) bgm.play().catch(()=>{});
-        }
-
-        function deactivateMatrix() {
-            matrixCanvas.classList.remove('active');
-            if (matrixInterval) clearInterval(matrixInterval);
-            mCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-        }
-
-        function startMatrixAnimation(fontSize) {
-            const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポ1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            const columns = matrixCanvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-
-            function drawMatrix() {
-                mCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-                
-                mCtx.fillStyle = '#0F0'; // Classic Matrix Green
-                mCtx.font = fontSize + 'px monospace';
-
-                for(let i = 0; i < drops.length; i++) {
-                    const text = katakana.charAt(Math.floor(Math.random() * katakana.length));
-                    mCtx.fillText(text, i*fontSize, drops[i]*fontSize);
-
-                    if(drops[i]*fontSize > matrixCanvas.height && Math.random() > 0.975)
-                        drops[i] = 0;
-                    drops[i]++;
-                }
-            }
-            
-            // Clear any existing interval first
-            if (matrixInterval) clearInterval(matrixInterval);
-            matrixInterval = setInterval(drawMatrix, 30);
-        }
-    </script>
 </body>
 </html>
