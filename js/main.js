@@ -323,7 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener("mousedown", () => { document.body.classList.add("clicking"); });
         document.addEventListener("mouseup", () => { document.body.classList.remove("clicking"); });
 
-        document.querySelectorAll("a, button, .card, .game-btn, .fuel-btn, .timeline-item").forEach(link => {
+        // [修改] 加入了 .tl-content 以便光标识别
+        document.querySelectorAll("a, button, .card, .game-btn, .fuel-btn, .tl-content, .timeline-item").forEach(link => {
             link.addEventListener("mouseenter", () => { document.body.classList.add("hover-link"); });
             link.addEventListener("mouseleave", () => { document.body.classList.remove("hover-link"); });
         });

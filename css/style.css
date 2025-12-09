@@ -798,3 +798,37 @@ section {
 .nav-links {
     max-width: 100vw;
 }
+
+/* ========== Timeline Hover Effects (新增：日志交互动效) ========== */
+
+/* 1. 鼠标悬停时，内容卡片高亮 */
+.timeline-item:hover .tl-content {
+    background: rgba(30, 30, 35, 0.95); /* 背景变亮 */
+    border-left-color: var(--primary-color); /* 左边框变青色 */
+    box-shadow: 0 0 25px rgba(0, 255, 242, 0.15); /* 增加青色辉光 */
+    transform: scale(1.02) translateX(5px); /* 轻微放大并向右浮动 */
+    z-index: 10; /* 确保浮在最上层 */
+}
+
+/* 2. 鼠标悬停时，左侧圆点也同步点亮 (即使未滚动到) */
+.timeline-item:hover .tl-point {
+    background: var(--primary-color);
+    border-color: #fff;
+    box-shadow: 0 0 15px var(--primary-color);
+    transform: scale(1.3);
+}
+
+/* 3. 针对最新的 HEAD 节点 (Nomura)，悬停时用紫色高亮，区分度更高 */
+.timeline-item:first-child:hover .tl-point {
+    background: var(--secondary-color);
+    box-shadow: 0 0 15px var(--secondary-color);
+}
+.timeline-item:first-child:hover .tl-content {
+    border-left-color: var(--secondary-color);
+    box-shadow: 0 0 25px rgba(189, 0, 255, 0.15);
+}
+
+/* 4. 优化过渡动画，使其丝滑 */
+.tl-content, .tl-point {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
