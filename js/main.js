@@ -696,17 +696,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30);
     }
 
-    // --- 12. ID CARD GENERATOR (身份卡生成器) ---
-    window.generateIDCard = function() {
-        const btn = document.querySelector('.tool-btn');
-        const originalText = btn.innerText;
+    // --- 12. ID CARD GENERATOR (REFINED) ---
+    let generatedCanvas = null; // 用于存储生成的 Canvas 对象
 
-        // 1. 改变按钮状态
-        btn.innerText = "[GENERATING...]";
-        btn.style.color = "var(--gold)";
-        document.body.style.cursor = "wait";
+    // 1. 打开弹窗并开始生成预览
+    window.generateAndPreviewID = function() {
+        const overlay = document.getElementById('id-card-overlay');
+        const previewArea = document.getElementById('id-preview-area');
+        const loadingText = document.getElementById('id-loading-text');
 
-        // 2. 获取实时数据
+        // 显示弹窗
+        overlay.classList.add('active');
+        previewArea.innerHTML = ''; // 清空旧预览
+        previewArea.appendChild(loadingText); // 显示加载文字
+        loadingText.style.display = 'block';
+
+        // 模拟一点“扫描”的延迟感，增加科技感
+        setTimeout(() => {
+            updateCardData(); // 更新卡片上的时间和访客数据
+            renderCardToCanvas(previewArea, loadingText);
+        }, 800);
+    };
+
+    // 2. 关闭弹窗
+    window.closeIDModal = function() {
+        document.getElementById('id-card-overlay').classList.remove('active');
+    };
+
+    // 3. 执行下载
+    window.downloadIDCard = function() {
+        if (!generatedCanvas) return;
+
+        const link = document.createElement('a');
+        link.download = `PHIL_ACCESS_PASS_${Date.now()}.png`;
+        link.href = generatedCanvas.toDataURL('image/png');
+        link.click();
+
+        // 下载后自动关闭
+        setTimeout(window.closeIDModal, 1000);
+    };
+
+    // [Helper] 更新隐藏卡片的数据
+    function updateCardData() {
         const visitorCount = document.getElementById('cyber-counter').innerText;
         const now = new Date();
         const timeStr = now.getFullYear() + '.' +
@@ -715,46 +746,35 @@ document.addEventListener('DOMContentLoaded', () => {
             now.getHours().toString().padStart(2,'0') + ':' +
             now.getMinutes().toString().padStart(2,'0');
 
-        // 3. 填入隐藏的模板
-        document.getElementById('card-visitor-id').innerText = visitorCount === "INIT..." ? "UNKNOWN" : ("#" + visitorCount);
+        document.getElementById('card-visitor-id').innerText =
+            (visitorCount === "INIT..." || !visitorCount) ? "UNKNOWN" : ("#" + visitorCount);
         document.getElementById('card-timestamp').innerText = timeStr;
+    }
 
-        // 4. 开始截图
+    // [Helper] 渲染逻辑
+    function renderCardToCanvas(container, loader) {
         const cardElement = document.querySelector('.cyber-id-card');
 
-        // 稍微延迟一点以确保DOM更新
-        setTimeout(() => {
-            html2canvas(cardElement, {
-                backgroundColor: '#050508', // 确保背景色正确
-                scale: 2, // 高清截图 (2倍屏)
-                useCORS: true, // 允许跨域图片 (针对头像)
-                logging: false
-            }).then(canvas => {
-                // 5. 触发下载
-                const link = document.createElement('a');
-                link.download = `PHIL_ACCESS_PASS_${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+        html2canvas(cardElement, {
+            backgroundColor: '#050508',
+            scale: 2, // 高清
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            generatedCanvas = canvas; // 存起来供下载使用
 
-                // 6. 恢复按钮
-                btn.innerText = "[DOWNLOAD_COMPLETE]";
-                btn.style.color = "var(--string-green)";
-                document.body.style.cursor = "default";
+            // 将 Canvas 缩小一点放入预览区
+            canvas.style.width = "100%";
+            canvas.style.height = "auto";
 
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.color = "";
-                }, 3000);
-            }).catch(err => {
-                console.error(err);
-                btn.innerText = "[ERROR_FAILED]";
-                btn.style.color = "var(--danger-color)";
-                document.body.style.cursor = "default";
-            });
-        }, 100);
-    };
-
-    // ... (在 js/main.js 之前的代码后面) ...
+            loader.style.display = 'none';
+            container.appendChild(canvas);
+        }).catch(err => {
+            console.error(err);
+            loader.innerText = "Error: Rendering Failed.";
+            loader.style.color = "var(--danger-color)";
+        });
+    }
 
     // --- 13. LIVE CODE PRINTER (完美版代码打印机) ---
     const codeContainer = document.getElementById('code-container');
