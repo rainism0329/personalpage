@@ -530,4 +530,102 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- 10. SKILL RADAR CHART (赛博朋克技能雷达图) ---
+    const radarCanvas = document.getElementById('skillRadarChart');
+    if (radarCanvas && typeof Chart !== 'undefined') {
+        const ctx = radarCanvas.getContext('2d');
+
+        // 赛博朋克配色定义
+        const cyan = '#00fff2';
+        const purple = '#bd00ff';
+        const darkBg = 'rgba(10, 10, 15, 0.9)';
+        const font = "'JetBrains Mono', monospace"; // 使用等宽字体
+
+        // 数据配置 (根据你的资深人设预设)
+        // 维度建议用英文，在雷达图上看起来更简洁专业
+        const data = {
+            // 这里的标签对应那 6 个技能标签，尽量简写以适应图表显示
+            labels: ['Java / JVM', 'Spring Boot', 'Microservices', 'Kafka / MQ', 'Docker / K8s', 'Oracle / SQL'],
+            datasets: [{
+                label: 'Proficiency',
+                // 资深专家的数值设定 (Java给最高)
+                data: [98, 95, 92, 88, 85, 90],
+                backgroundColor: 'rgba(0, 255, 242, 0.2)',
+                borderColor: cyan,
+                borderWidth: 2,
+                pointBackgroundColor: cyan,
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: cyan,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.1
+            }]
+        };
+
+        // 图表配置选项
+        const config = {
+            type: 'radar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // 允许自适应容器高度
+                scales: {
+                    r: {
+                        // 角度线 (放射线)
+                        angleLines: {
+                            color: 'rgba(0, 255, 242, 0.15)'
+                        },
+                        // 网格线 (一圈圈的线)
+                        grid: {
+                            color: 'rgba(0, 255, 242, 0.15)',
+                            circular: true // 设置为圆形网格，更有科技感
+                        },
+                        // 标签 (Backend Arch 等文字)
+                        pointLabels: {
+                            color: '#ccc',
+                            font: {
+                                family: font,
+                                size: 11,
+                                weight: 'bold'
+                            }
+                        },
+                        // 刻度 (0-100的数字，隐藏掉更简洁)
+                        ticks: {
+                            display: false,
+                            beginAtZero: true,
+                            max: 100,
+                            stepSize: 20
+                        }
+                    }
+                },
+                plugins: {
+                    // 隐藏图例 (不需要显示 "Proficiency")
+                    legend: { display: false },
+                    // 提示框配置 (鼠标放上去显示数值)
+                    tooltip: {
+                        backgroundColor: darkBg,
+                        titleColor: cyan,
+                        bodyColor: '#fff',
+                        titleFont: { family: font, size: 14 },
+                        bodyFont: { family: font, size: 13 },
+                        borderColor: cyan,
+                        borderWidth: 1,
+                        displayColors: false, // 不显示颜色小方块
+                        padding: 10,
+                        callbacks: {
+                            // 自定义提示文字格式
+                            label: function(context) {
+                                return `> System.eval(): ${context.raw} / 100`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // 初始化图表
+        new Chart(ctx, config);
+    }
 });

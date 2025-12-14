@@ -67,24 +67,76 @@
 <section id="about">
     <div class="section-title" data-aos="fade-up" data-i18n="about_title">System Stats</div>
     <div class="grid">
-        <div class="card" data-aos="fade-up" data-aos-delay="100">
-            <h3><i class="fas fa-user-secret"></i> <span data-i18n="profile_title">Profile</span></h3>
-            <p style="margin-top: 15px; font-size: 0.95rem; color: #ccc;">
-                <strong style="color: var(--primary-color)" data-i18n="label_role">Role:</strong> <span data-i18n="val_role">Lead Software Engineer</span><br>
-                <strong style="color: var(--primary-color)" data-i18n="label_edu">Education:</strong> <span data-i18n="val_edu">MSc Computer Science, Univ. of Leicester</span><br>
-                <strong style="color: var(--primary-color)" data-i18n="label_focus">Focus:</strong> <span data-i18n="val_focus">High-performance Backend, Cloud Architecture</span><br>
-                <strong style="color: var(--primary-color)" data-i18n="label_curr">Current:</strong> <span data-i18n="val_curr">Top-Tier Investment Bank</span>
-            </p>
+        <div class="card profile-card" data-aos="fade-up" data-aos-delay="100">
+            <h3><i class="fas fa-id-card"></i> <span data-i18n="profile_title">Profile</span></h3>
+
+            <div class="profile-layout">
+                <div class="profile-visual">
+                    <div class="profile-avatar-container">
+                        <img src="p11_compressed.jpg" alt="Phil" class="profile-img">
+                        <div class="scan-line"></div>
+                    </div>
+                    <div class="profile-level">
+                        <span class="level-label">LV.10</span>
+                        <div class="xp-bar-container">
+                            <div class="xp-bar-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-info">
+                    <div class="info-item">
+                        <i class="fas fa-user-astronaut"></i>
+                        <div>
+                            <div class="info-label" data-i18n="label_role">Role</div>
+                            <div class="info-val highlight" data-i18n="val_role">Lead Software Engineer</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <div>
+                            <div class="info-label" data-i18n="label_edu">Education</div>
+                            <div class="info-val" data-i18n="val_edu">MSc CS, Univ. of Leicester</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-crosshairs"></i>
+                        <div>
+                            <div class="info-label" data-i18n="label_focus">Focus</div>
+                            <div class="info-val" data-i18n="val_focus">High-performance Backend</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-building"></i>
+                        <div>
+                            <div class="info-label" data-i18n="label_curr">Current</div>
+                            <div class="info-val" data-i18n="val_curr">Top-Tier Investment Bank</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-footer">
+                        <span class="id-code">ID: 8F4A2D-PHIL</span>
+                        <span class="verified-badge"><i class="fas fa-check-circle"></i> VERIFIED</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="card" data-aos="fade-up" data-aos-delay="200">
             <h3><i class="fas fa-code"></i> <span data-i18n="stack_title">Tech Stack</span></h3>
-            <div style="margin-top: 15px;">
-                <span class="skill-tag">Java Expert</span>
-                <span class="skill-tag">Spring Boot</span>
-                <span class="skill-tag">Microservices</span>
-                <span class="skill-tag">Kafka/ActiveMQ</span>
-                <span class="skill-tag">Docker/K8s</span>
-                <span class="skill-tag">Oracle/SQL</span>
+
+            <div class="tech-hybrid-container">
+                <div class="radar-box">
+                    <canvas id="skillRadarChart"></canvas>
+                </div>
+
+                <div class="tags-box">
+                    <span class="skill-tag" style="border-color: var(--gold); color: var(--gold);">Java Expert</span>
+                    <span class="skill-tag">Spring Boot</span>
+                    <span class="skill-tag">Microservices</span>
+                    <span class="skill-tag">Kafka / ActiveMQ</span>
+                    <span class="skill-tag">Docker / K8s</span>
+                    <span class="skill-tag">Oracle / SQL</span>
+                </div>
             </div>
         </div>
     </div>
@@ -339,7 +391,7 @@
 <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/game.js"></script>
 <script src="js/terminal.js"></script>
 <script src="js/ai-chat.js"></script>
