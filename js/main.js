@@ -753,4 +753,127 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }, 100);
     };
+
+    // ... (在 js/main.js 之前的代码后面) ...
+
+    // --- 13. LIVE CODE PRINTER (完美版代码打印机) ---
+    const codeContainer = document.getElementById('code-container');
+
+    if (codeContainer) {
+        // 1. 定义硬核的 Java 业务代码 (带 HTML 颜色标签)
+        // 这里的代码完全符合您 "Credit Risk" 和 "High Performance" 的人设
+        const sourceLines = [
+            "<span class='code-kw'>package</span> com.phil.risk_system.core;",
+            "",
+            "<span class='code-kw'>import</span> org.springframework.stereotype.Service;",
+            "<span class='code-kw'>import</span> reactor.core.publisher.Mono;",
+            "",
+            "<span class='code-com'>/**</span>",
+            "<span class='code-com'> * High-performance Credit Risk Calculation Engine</span>",
+            "<span class='code-com'> * Handles real-time exposure analysis for OTC derivatives.</span>",
+            "<span class='code-com'> */</span>",
+            "<span class='code-anno'>@Service</span>",
+            "<span class='code-kw'>public class</span> <span class='code-cls'>CreditRiskEngine</span> {",
+            "    ",
+            "    <span class='code-kw'>private static final double</span> <span class='code-var'>VAR_CONFIDENCE</span> = <span class='code-num'>0.99</span>;",
+            "    <span class='code-kw'>private final</span> <span class='code-cls'>GridComputeCluster</span> <span class='code-var'>computeGrid</span>;",
+            "    ",
+            "    <span class='code-com'>// Injecting high-availability dependency</span>",
+            "    <span class='code-kw'>public</span> <span class='code-fn'>CreditRiskEngine</span>(<span class='code-cls'>GridComputeCluster</span> <span class='code-var'>grid</span>) {",
+            "        <span class='code-kw'>this</span>.<span class='code-var'>computeGrid</span> = <span class='code-var'>grid</span>;",
+            "    }",
+            "    ",
+            "    <span class='code-anno'>@Trace(level = \"INFO\")</span>",
+            "    <span class='code-kw'>public</span> <span class='code-cls'>Mono</span>&lt;<span class='code-cls'>RiskReport</span>&gt; <span class='code-fn'>analyzeExposure</span>(<span class='code-cls'>TradeContext</span> <span class='code-var'>ctx</span>) {",
+            "        <span class='code-kw'>return</span> <span class='code-var'>computeGrid</span>.<span class='code-fn'>dispatch</span>(<span class='code-var'>ctx</span>)",
+            "                          .<span class='code-fn'>map</span>(<span class='code-kw'>this</span>::<span class='code-fn'>calculatePFE</span>) <span class='code-com'>// Potential Future Exposure</span>",
+            "                          .<span class='code-fn'>filter</span>(<span class='code-var'>report</span> -> <span class='code-var'>report</span>.<span class='code-fn'>isWithinLimit</span>())",
+            "                          .<span class='code-fn'>doOnError</span>(<span class='code-cls'>AlertSystem</span>::<span class='code-fn'>triggerBreach</span>);",
+            "    }",
+            "    ",
+            "    <span class='code-kw'>private</span> <span class='code-cls'>RiskReport</span> <span class='code-fn'>calculatePFE</span>(<span class='code-cls'>SimulationResult</span> <span class='code-var'>sim</span>) {",
+            "        <span class='code-com'>// Monte Carlo Simulation: 50,000 paths</span>",
+            "        <span class='code-kw'>double</span> <span class='code-var'>exposure</span> = <span class='code-var'>sim</span>.<span class='code-fn'>getTailDistribution</span>(<span class='code-var'>VAR_CONFIDENCE</span>);",
+            "        <span class='code-kw'>if</span> (<span class='code-var'>exposure</span> > <span class='code-cls'>Config</span>.<span class='code-var'>MAX_THRESHOLD</span>) {",
+            "            <span class='code-cls'>System</span>.<span class='code-var'>out</span>.<span class='code-fn'>println</span>(<span class='code-str'>\"[WARN] COUNTERPARTY LIMIT BREACHED\"</span>);",
+            "        }",
+            "        <span class='code-kw'>return new</span> <span class='code-cls'>RiskReport</span>(<span class='code-var'>exposure</span>);",
+            "    }",
+            "}"
+        ];
+
+        let lineIndex = 0;
+        let charIndex = 0;
+        let currentHTML = ""; // 累积的 HTML
+
+        // 2. 智能打字函数
+        function typeCode() {
+            if (lineIndex >= sourceLines.length) {
+                // 写完了，停顿一下重头开始 (无限循环)
+                setTimeout(() => {
+                    codeContainer.innerHTML = "";
+                    lineIndex = 0;
+                    charIndex = 0;
+                    currentHTML = "";
+                    typeCode();
+                }, 5000);
+                return;
+            }
+
+            const currentLine = sourceLines[lineIndex];
+
+            // 每次只处理一行里的一个“逻辑字符”
+            // 为了处理 HTML 标签，我们需要判断当前 charIndex 指向的是不是 '<'
+            if (charIndex < currentLine.length) {
+
+                // 检查是否遇到 HTML 标签的开始
+                if (currentLine[charIndex] === '<') {
+                    // 如果是标签，直接找到闭合的 '>'，把整个标签一次性加进去
+                    // 这样不会打出 '< s p a n...' 这种中间状态
+                    const closeIndex = currentLine.indexOf('>', charIndex);
+                    if (closeIndex !== -1) {
+                        const tag = currentLine.substring(charIndex, closeIndex + 1);
+                        currentHTML += tag;
+                        charIndex = closeIndex + 1;
+                    }
+                } else {
+                    // 普通字符，逐个打出
+                    // 如果是 &lt; 或 &gt; 这种实体字符，也要整体处理，否则会乱
+                    if (currentLine.substr(charIndex, 4) === '&lt;') {
+                        currentHTML += '&lt;';
+                        charIndex += 4;
+                    } else if (currentLine.substr(charIndex, 4) === '&gt;') {
+                        currentHTML += '&gt;';
+                        charIndex += 4;
+                    } else {
+                        currentHTML += currentLine[charIndex];
+                        charIndex++;
+                    }
+                }
+
+                // 更新 DOM，加上光标
+                codeContainer.innerHTML = currentHTML + "<span class='code-cursor'></span>";
+
+                // 随机打字速度 (30ms - 80ms)
+                setTimeout(typeCode, Math.random() * 50 + 30);
+
+            } else {
+                // 这一行打完了，换行
+                currentHTML += "\n";
+                codeContainer.innerHTML = currentHTML + "<span class='code-cursor'></span>";
+                lineIndex++;
+                charIndex = 0;
+
+                // 换行时稍微停顿一下
+                setTimeout(typeCode, 200);
+
+                // 自动滚动到底部
+                const bg = document.getElementById('code-background');
+                bg.scrollTop = bg.scrollHeight;
+            }
+        }
+
+        // 3. 启动引擎 (延迟1秒，等页面加载完)
+        setTimeout(typeCode, 1000);
+    }
 });

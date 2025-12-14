@@ -1264,3 +1264,68 @@ footer {
     transform: rotate(-15deg); pointer-events: none;
     border: 4px solid rgba(255, 255, 255, 0.05); padding: 10px;
 }
+
+/* ========== Live Coding Background (增强版) ========== */
+#code-background {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 120px 20px 20px 50px; /* 调整位置，避开左边logo */
+
+    /* [修改] 提升透明度，让它更明显 */
+    opacity: 0.35;
+
+    /* [修改] 减小遮罩范围，让更多代码可见 */
+    mask-image: linear-gradient(to bottom, transparent 5%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 5%, black 15%, black 85%, transparent 100%);
+}
+
+/* [修改] 基础代码颜色调亮，稍微带点青色倾向，呼应主题 */
+#code-container {
+    color: #cadbe8;
+    white-space: pre-wrap;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* 加点阴影防止和背景混淆 */
+}
+
+/* 语法高亮保持不变 (仿 IntelliJ IDEA Dark) */
+.code-kw { color: #cc7832; font-weight: bold; }
+.code-cls { color: #a9b7c6; }
+.code-fn { color: #ffc66d; }
+.code-var { color: #9876aa; }
+.code-str { color: #6a8759; }
+.code-num { color: #6897bb; }
+.code-anno { color: #bbb529; }
+.code-com { color: #808080; font-style: italic; }
+
+/* 光标特效 */
+.code-cursor {
+    display: inline-block;
+    width: 8px; height: 18px;
+    background: var(--primary-color);
+    vertical-align: text-bottom;
+    box-shadow: 0 0 10px var(--primary-color); /* 让光标发光 */
+    animation: blinkCursor 1s infinite;
+}
+@keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ========== 移动端适配 (开启显示) ========== */
+@media (max-width: 768px) {
+    #code-background {
+        display: block !important; /* [关键] 强制开启 */
+        font-size: 10px; /* 字体变小 */
+        line-height: 1.4;
+        padding: 100px 10px 10px 20px; /* 减少内边距 */
+        opacity: 0.15; /* 手机上淡一点，不然看不清前景字 */
+    }
+
+    /* 手机上隐藏光标，减少视觉干扰 */
+    .code-cursor {
+        opacity: 0.5;
+        width: 5px;
+    }
+}
