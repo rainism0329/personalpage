@@ -1,5 +1,5 @@
 /**
- * Simulated AI Chat Assistant (Multi-Language & Dark Cyberpunk Edition)
+ * Simulated AI Chat Assistant (Dual Contact Channel & Multi-Language)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const optionsArea = document.getElementById('ai-options-area');
     let hasInitialized = false;
 
-    // --- 1. 多语言语料库 ---
+    // --- 1. 多语言语料库 (新增了 btn_form) ---
     const aiData = {
         en: {
             connecting: "Establishing encrypted connection... [OK]",
@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
             opt_donate: "⚡ Recharge System",
             opt_chat: "☕ Just Chatting",
 
-            resp_hiring: "Phil is currently focused on <strong>High-Frequency Trading</strong> and <strong>Cloud-Native Architecture</strong>.<br>You can send an encrypted transmission (Email) or request access to his dossier.",
-            btn_email: "📧 Send Email",
+            resp_hiring: "Phil is currently focused on <strong>High-Frequency Trading</strong> and <strong>Cloud-Native Architecture</strong>.<br>You can send a direct email or leave a secure message.",
+            btn_email: "📧 Send Email (Direct)",   // [保留] 直接发邮件
+            btn_form: "📡 Secure Message (Form)", // [新增] 在线留言表单
             btn_back: "🔙 Back to Terminal",
 
             resp_donate: "Energy transfer request detected. Please select a protocol:<br>Your support powers the next commit.",
@@ -29,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             resp_chat: "Beep Boop... 🤖<br>Phil enjoys Cyberpunk literature, coffee, and late-night builds.<br>If you are in Shanghai, maybe initiate an offline session?",
             btn_coffee: "☕ Coffee Invite (Email)",
+
+            resp_contact_open: "Secure channel established.<br>Please input your data packet in the overlay window.",
 
             resp_menu: "Command reset. Awaiting input..."
         },
@@ -40,8 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
             opt_donate: "⚡ 为系统充能",
             opt_chat: "☕ 随便聊聊",
 
-            resp_hiring: "Phil 目前专注于 <strong>高频交易架构</strong> 与 <strong>云原生方案</strong>。<br>您可以直接发送加密信件（邮件）或获取详细档案。",
-            btn_email: "📧 发送邮件",
+            resp_hiring: "Phil 目前专注于 <strong>高频交易架构</strong> 与 <strong>云原生方案</strong>。<br>您可以选择直接发送邮件，或通过加密通道留言。",
+            btn_email: "📧 发送邮件 (直接)",     // [保留] 直接发邮件
+            btn_form: "📡 加密留言 (表单)",     // [新增] 在线留言表单
             btn_back: "🔙 返回终端",
 
             resp_donate: "检测到能量传输请求。请选择传输协议：<br>您的支持是系统运行的燃料。",
@@ -50,13 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btn_github: "🐙 访问 GitHub",
 
             resp_chat: "Beep Boop... 🤖<br>Phil 喜欢赛博朋克文学、咖啡和深夜的代码构建。<br>如果你也在上海，也许可以发起线下会话。",
-            btn_coffee: "☕ 约咖啡 (Email)",
+            btn_coffee: "☕ 约咖啡 (邮件)",
+
+            resp_contact_open: "安全通道已建立。<br>请在弹出的界面中输入数据包。",
 
             resp_menu: "指令已重置。等待输入..."
         }
     };
 
-    // 获取当前语言 (默认为英文)
     function getLang() {
         return localStorage.getItem('site_lang') || 'en';
     }
@@ -69,8 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleAIChat = function() {
         chatWindow.classList.toggle('hidden');
 
-        // 每次打开都检查语言，如果未初始化则开始，如果已初始化但语言变了（可选：重置）
-        // 这里简化逻辑：只在第一次打开时初始化欢迎语。
         if (!chatWindow.classList.contains('hidden') && !hasInitialized) {
             hasInitialized = true;
             const t = aiData[getLang()];
@@ -98,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearOptions();
         showTypingIndicator();
 
-        // 每次交互时重新获取语言，确保即时切换
         const lang = getLang();
         const t = aiData[lang];
 
@@ -111,7 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 case "hiring":
                     responseText = t.resp_hiring;
                     nextOptions = [
+                        // [修改] 同时提供两种方式
                         { label: t.btn_email, action: "mailto:bigphil.zhang@qq.com" },
+                        { label: t.btn_form, value: "open_contact" },
                         { label: t.btn_back, value: "menu" }
                     ];
                     break;
@@ -136,7 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 case "chat":
                     responseText = t.resp_chat;
                     nextOptions = [
+                        // [修改] 闲聊也可以选留言或邮件
                         { label: t.btn_coffee, action: "mailto:bigphil.zhang@qq.com" },
+                        { label: t.btn_form, value: "open_contact" },
+                        { label: t.btn_back, value: "menu" }
+                    ];
+                    break;
+
+                // [新增] 处理打开联系人表单的逻辑
+                case "open_contact":
+                    if (window.toggleContact) {
+                        window.toggleContact(); // 调用 main.js 里的函数
+                        responseText = t.resp_contact_open;
+                    } else {
+                        responseText = "Error: Contact module not loaded.";
+                    }
+                    // 打开表单后，AI 给个“返回菜单”的选项，或者什么都不给也可以
+                    nextOptions = [
                         { label: t.btn_back, value: "menu" }
                     ];
                     break;
@@ -164,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesArea.appendChild(row);
         scrollToBottom();
 
-        // 播放打字音效
         const sfx = document.getElementById('sfx-hover');
         if(sfx && sender === 'bot') {
             sfx.currentTime=0;

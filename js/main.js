@@ -478,4 +478,56 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- 10. CONTACT FORM HANDLING (新增：留言系统) ---
+    const contactOverlay = document.getElementById('contact-overlay');
+    const contactForm = document.getElementById('cyber-form');
+    const formStatus = document.getElementById('form-status');
+
+    // 全局函数：切换显示
+    window.toggleContact = function() {
+        contactOverlay.classList.toggle('active');
+        if(contactOverlay.classList.contains('active')) {
+            formStatus.innerText = ""; // 重置状态
+            contactForm.reset();
+        }
+    };
+
+    // AJAX 提交表单 (不跳转页面)
+    if (contactForm) {
+        contactForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // 阻止默认跳转
+            const data = new FormData(event.target);
+            const btn = contactForm.querySelector('button');
+            const originalText = btn.innerText;
+
+            btn.innerText = "TRANSMITTING...";
+            btn.disabled = true;
+
+            fetch(event.target.action, {
+                method: contactForm.method,
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    formStatus.innerHTML = "<span style='color:#50fa7b'>>> SUCCESS: MESSAGE UPLOADED.</span>";
+                    contactForm.reset();
+                    setTimeout(() => toggleContact(), 2000); // 2秒后自动关闭
+                } else {
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            formStatus.innerHTML = `<span style='color:#ff5555'>>> ERROR: ${data["errors"].map(error => error["message"]).join(", ")}</span>`;
+                        } else {
+                            formStatus.innerHTML = "<span style='color:#ff5555'>>> ERROR: TRANSMISSION FAILED.</span>";
+                        }
+                    });
+                }
+            }).catch(error => {
+                formStatus.innerHTML = "<span style='color:#ff5555'>>> NET_ERR: CONNECTION LOST.</span>";
+            }).finally(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+        });
+    }
 });

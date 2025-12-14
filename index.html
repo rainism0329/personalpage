@@ -259,6 +259,35 @@
     <div class="terminal-hint">Press <span class="key-tag">ESC</span> or <span class="key-tag">~</span> to close</div>
 </div>
 
+<div id="contact-overlay" class="hidden">
+    <div class="contact-window">
+        <div class="contact-header">
+            <i class="fas fa-satellite-dish"></i> ENCRYPTED TRANSMISSION
+            <div class="contact-close" onclick="toggleContact()"><i class="fas fa-times"></i></div>
+        </div>
+
+        <form id="cyber-form" action="https://formspree.io/f/mrbndkjd" method="POST">
+
+            <div class="form-group">
+                <label>> SENDER_ID (Email):</label>
+                <input type="email" name="email" required placeholder="name@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>> DATA_PACKET (Message):</label>
+                <textarea name="message" required placeholder="Enter your message here..."></textarea>
+            </div>
+
+            <button type="submit" class="cyber-submit-btn">
+                <span class="btn-text">INITIATE UPLOAD</span>
+                <span class="btn-glitch"></span>
+            </button>
+
+            <p id="form-status"></p>
+        </form>
+    </div>
+</div>
+
 <div class="fuel-widget">
     <div class="fuel-status">
         <i class="fas fa-bolt"></i> <span data-i18n="fuel_status">RECHARGE</span>
@@ -310,6 +339,7 @@
 <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
 <script src="js/game.js"></script>
 <script src="js/terminal.js"></script>
 <script src="js/ai-chat.js"></script>

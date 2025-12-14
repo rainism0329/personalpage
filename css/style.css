@@ -832,3 +832,65 @@ section {
 .tl-content, .tl-point {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+/* ========== 加密通讯模态框 (Contact Overlay) ========== */
+#contact-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
+    z-index: 10001; /* 比 AI 还要高 */
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+}
+#contact-overlay.active { opacity: 1; pointer-events: all; }
+
+.contact-window {
+    width: 90%; max-width: 500px;
+    background: #0a0a0f;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 30px rgba(0, 255, 242, 0.15);
+    padding: 2px; /* 为了做双层边框 */
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+}
+
+.contact-header {
+    background: rgba(0, 255, 242, 0.1);
+    color: var(--primary-color);
+    padding: 15px 20px;
+    font-family: 'JetBrains Mono';
+    font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(0, 255, 242, 0.3);
+}
+.contact-close { cursor: pointer; transition: 0.3s; }
+.contact-close:hover { color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color); }
+
+#cyber-form { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+
+.form-group label {
+    display: block; color: #888; font-family: 'JetBrains Mono'; font-size: 0.8rem; margin-bottom: 8px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%; background: rgba(255,255,255,0.05);
+    border: 1px solid #333; color: #fff;
+    padding: 12px; font-family: 'Poppins';
+    transition: 0.3s; outline: none;
+}
+.form-group input:focus, .form-group textarea:focus {
+    border-color: var(--primary-color);
+    background: rgba(0, 255, 242, 0.05);
+    box-shadow: 0 0 15px rgba(0, 255, 242, 0.1);
+}
+.form-group textarea { min-height: 120px; resize: vertical; }
+
+/* 提交按钮 */
+.cyber-submit-btn {
+    background: var(--primary-color); color: #000;
+    border: none; padding: 12px; font-weight: bold;
+    font-family: 'JetBrains Mono'; cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: 0.3s; position: relative; overflow: hidden;
+}
+.cyber-submit-btn:hover {
+    background: #fff; box-shadow: 0 0 20px var(--primary-color);
+}
