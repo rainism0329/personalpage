@@ -368,13 +368,28 @@
 </div>
 
 <footer>
-    <div class="system-time" id="local-time">SYS_TIME: --:--:--</div>
+    <div class="footer-info">
+        <div class="system-time" id="local-time">SYS_TIME: --:--:--</div>
+
+        <div class="visitor-counter">
+            <i class="fas fa-eye"></i>
+            <span class="counter-label">VISITORS:</span>
+            <span id="cyber-counter">INIT...</span>
+        </div>
+
+        <span id="busuanzi_container_site_pv" style="display:none">
+                <span id="busuanzi_value_site_pv"></span>
+            </span>
+    </div>
+
     <p>Phil's Portfolio. <span style="color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color);" data-i18n="footer_text">No Bugs, Just Features.</span></p>
+
     <div class="social-links">
         <a href="mailto:bigphil.zhang@qq.com" target="_blank"><i class="fas fa-envelope"></i></a>
         <a href="https://github.com/rainism0329" target="_blank"><i class="fab fa-github"></i></a>
         <a href="https://plugins.jetbrains.com/vendor/philz_dev" target="_blank"><i class="fas fa-puzzle-piece"></i></a>
     </div>
+
     <div class="mobile-donate-container">
         <p class="mobile-fuel-label" data-i18n="mob_donate_label">>>> MOBILE RECHARGE UNIT</p>
         <div class="mobile-donate-btns">
@@ -382,11 +397,17 @@
             <a href="https://ko-fi.com/philipzhang51603" target="_blank" class="mob-btn kofi"><i class="fas fa-mug-hot"></i></a>
         </div>
     </div>
+
     <div class="terminal-hint-footer">
         <span class="blink-symbol">>_</span> SYSTEM_ROOT: PRESS <span class="key-highlight">['~']</span> TO ACCESS
     </div>
-    <div class="konami-hint">// KONAMI: ⬆⬆⬇⬇⬅➡⬅➡BA</div>
+
+    <div class="footer-tools">
+        <span class="tool-btn" onclick="alert('Feature coming soon...')">[GENERATE_ID]</span>
+    </div>
 </footer>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

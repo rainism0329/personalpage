@@ -628,4 +628,71 @@ document.addEventListener('DOMContentLoaded', () => {
         // 初始化图表
         new Chart(ctx, config);
     }
+
+    // --- 11. HACKER VISITOR COUNTER (黑客风格计数器) ---
+    const counterDisplay = document.getElementById('cyber-counter');
+    const busuanziSource = document.getElementById('busuanzi_value_site_pv');
+
+    if (counterDisplay && busuanziSource) {
+        // 观察不蒜子元素的变化 (因为它也是异步加载的)
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList' && busuanziSource.innerText) {
+                    // 1. 获取真实数据
+                    const rawVal = busuanziSource.innerText.trim();
+                    // 2. 格式化 (补零到6位，如 001,234)
+                    const finalVal = rawVal.padStart(6, '0').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    // 3. 启动解密动画
+                    animateDecryption(counterDisplay, finalVal);
+
+                    observer.disconnect(); // 动画只播一次
+                }
+            });
+        });
+
+        observer.observe(busuanziSource, { childList: true, subtree: true });
+
+        // 如果不蒜子加载慢，先显示假动画占位
+        let loadingInterval = setInterval(() => {
+            if(!busuanziSource.innerText) {
+                counterDisplay.innerText = Math.floor(Math.random()*999999).toString().padStart(6,'0');
+            } else {
+                clearInterval(loadingInterval);
+            }
+        }, 100);
+    }
+
+    // 解密动画函数
+    function animateDecryption(element, targetText) {
+        const chars = "0123456789";
+        let iterations = 0;
+
+        const interval = setInterval(() => {
+            element.innerText = targetText
+                .split("")
+                .map((char, index) => {
+                    if (char === ',' || char === '.') return char; // 标点符号不跳动
+                    if (index < iterations) {
+                        return targetText[index]; // 已经解密出的位
+                    }
+                    return chars[Math.floor(Math.random() * 10)]; // 还在跳动的乱码
+                })
+                .join("");
+
+            if (iterations >= targetText.length) {
+                clearInterval(interval);
+                element.innerText = targetText; // 确保最终结果正确
+                // 成功后的绿色闪烁反馈
+                element.style.color = "#50fa7b";
+                element.style.textShadow = "0 0 15px #50fa7b";
+                setTimeout(() => {
+                    element.style.color = ""; // 恢复原色
+                    element.style.textShadow = "";
+                }, 500);
+            }
+
+            iterations += 1/3; // 控制解密速度
+        }, 30);
+    }
 });
