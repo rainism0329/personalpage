@@ -402,10 +402,51 @@
         <span class="blink-symbol">>_</span> SYSTEM_ROOT: PRESS <span class="key-highlight">['~']</span> TO ACCESS
     </div>
 
-    <div class="footer-tools">
-        <span class="tool-btn" onclick="alert('Feature coming soon...')">[GENERATE_ID]</span>
-    </div>
+    <span class="tool-btn" onclick="generateIDCard()">[GENERATE_ID]</span>
 </footer>
+
+
+<div id="id-card-hidden" class="hidden-canvas-area">
+    <div class="cyber-id-card">
+        <div class="id-header">
+            <span class="id-title">PHIL_SYSTEM // ACCESS_PASS</span>
+            <span class="id-rank">CLASS: OBSERVER</span>
+        </div>
+
+        <div class="id-body">
+            <div class="id-avatar-box">
+                <img src="p11_compressed.jpg" alt="User" crossorigin="anonymous">
+                <div class="id-scanline"></div>
+            </div>
+
+            <div class="id-info">
+                <div class="id-row">
+                    <span class="id-label">VISITOR_ID:</span>
+                    <span class="id-val highlight" id="card-visitor-id">LOADING...</span>
+                </div>
+                <div class="id-row">
+                    <span class="id-label">TIMESTAMP:</span>
+                    <span class="id-val" id="card-timestamp">--:--:--</span>
+                </div>
+                <div class="id-row">
+                    <span class="id-label">ACCESS_LEVEL:</span>
+                    <span class="id-val">GUEST_V4</span>
+                </div>
+                <div class="id-row">
+                    <span class="id-label">STATUS:</span>
+                    <span class="id-val text-green">AUTHORIZED</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="id-footer">
+            <div class="id-barcode"></div>
+            <div class="id-sign">APPROVED BY PHIL.Z</div>
+        </div>
+
+        <div class="id-watermark">SECURE</div>
+    </div>
+</div>
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
@@ -413,6 +454,7 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="js/game.js"></script>
 <script src="js/terminal.js"></script>
 <script src="js/ai-chat.js"></script>

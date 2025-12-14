@@ -695,4 +695,62 @@ document.addEventListener('DOMContentLoaded', () => {
             iterations += 1/3; // 控制解密速度
         }, 30);
     }
+
+    // --- 12. ID CARD GENERATOR (身份卡生成器) ---
+    window.generateIDCard = function() {
+        const btn = document.querySelector('.tool-btn');
+        const originalText = btn.innerText;
+
+        // 1. 改变按钮状态
+        btn.innerText = "[GENERATING...]";
+        btn.style.color = "var(--gold)";
+        document.body.style.cursor = "wait";
+
+        // 2. 获取实时数据
+        const visitorCount = document.getElementById('cyber-counter').innerText;
+        const now = new Date();
+        const timeStr = now.getFullYear() + '.' +
+            (now.getMonth()+1).toString().padStart(2,'0') + '.' +
+            now.getDate().toString().padStart(2,'0') + ' ' +
+            now.getHours().toString().padStart(2,'0') + ':' +
+            now.getMinutes().toString().padStart(2,'0');
+
+        // 3. 填入隐藏的模板
+        document.getElementById('card-visitor-id').innerText = visitorCount === "INIT..." ? "UNKNOWN" : ("#" + visitorCount);
+        document.getElementById('card-timestamp').innerText = timeStr;
+
+        // 4. 开始截图
+        const cardElement = document.querySelector('.cyber-id-card');
+
+        // 稍微延迟一点以确保DOM更新
+        setTimeout(() => {
+            html2canvas(cardElement, {
+                backgroundColor: '#050508', // 确保背景色正确
+                scale: 2, // 高清截图 (2倍屏)
+                useCORS: true, // 允许跨域图片 (针对头像)
+                logging: false
+            }).then(canvas => {
+                // 5. 触发下载
+                const link = document.createElement('a');
+                link.download = `PHIL_ACCESS_PASS_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // 6. 恢复按钮
+                btn.innerText = "[DOWNLOAD_COMPLETE]";
+                btn.style.color = "var(--string-green)";
+                document.body.style.cursor = "default";
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.color = "";
+                }, 3000);
+            }).catch(err => {
+                console.error(err);
+                btn.innerText = "[ERROR_FAILED]";
+                btn.style.color = "var(--danger-color)";
+                document.body.style.cursor = "default";
+            });
+        }, 100);
+    };
 });

@@ -1180,3 +1180,87 @@ footer {
 #busuanzi_container_page_pv {
     display: none !important;
 }
+
+/* ========== Generate ID Card (Hidden Template) ========== */
+/* 将其移出屏幕，但保持渲染状态，display:none会导致html2canvas无法截图 */
+.hidden-canvas-area {
+    position: fixed;
+    top: 0; left: -9999px; /* 移出屏幕 */
+    z-index: -1;
+}
+
+.cyber-id-card {
+    width: 600px; height: 350px;
+    background: #050508;
+    border: 2px solid var(--primary-color);
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    position: relative;
+    display: flex; flex-direction: column;
+    /* 赛博朋克背景纹理 */
+    background-image:
+            linear-gradient(rgba(0, 255, 242, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 242, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-sizing: border-box;
+}
+
+/* 四角装饰 */
+.cyber-id-card::before {
+    content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px dashed #333; pointer-events: none;
+}
+
+.id-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px; margin-bottom: 20px;
+}
+.id-title { font-size: 24px; font-weight: bold; color: var(--primary-color); letter-spacing: 2px; }
+.id-rank { background: var(--secondary-color); color: #fff; padding: 2px 8px; font-size: 14px; border-radius: 2px; }
+
+.id-body { display: flex; gap: 30px; align-items: center; flex: 1; }
+
+.id-avatar-box {
+    width: 120px; height: 120px;
+    border: 2px solid #555;
+    position: relative; overflow: hidden;
+    filter: grayscale(100%) contrast(1.2);
+}
+.id-avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+.id-scanline {
+    position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+    background: rgba(0, 255, 242, 0.5);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.id-info { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.id-row { display: flex; justify-content: space-between; border-bottom: 1px solid #222; padding-bottom: 4px; }
+.id-label { color: #888; font-size: 14px; }
+.id-val { color: #ccc; font-size: 16px; font-weight: bold; }
+.id-val.highlight { color: var(--primary-color); text-shadow: 0 0 10px rgba(0, 255, 242, 0.5); font-size: 20px; }
+.id-val.text-green { color: #50fa7b; }
+
+.id-footer {
+    margin-top: auto; display: flex; justify-content: space-between; align-items: end;
+}
+
+/* CSS 绘制的假条形码 */
+.id-barcode {
+    width: 200px; height: 30px;
+    background: repeating-linear-gradient(
+            90deg,
+            #fff 0px, #fff 2px,
+            transparent 2px, transparent 4px,
+            #fff 4px, #fff 6px
+    );
+}
+
+.id-sign { font-family: 'Mrs Saint Delafield', cursive; font-size: 20px; color: #666; font-family: 'JetBrains Mono'; }
+
+.id-watermark {
+    position: absolute; right: 20px; bottom: 80px;
+    font-size: 80px; font-weight: 900; color: rgba(255, 255, 255, 0.03);
+    transform: rotate(-15deg); pointer-events: none;
+    border: 4px solid rgba(255, 255, 255, 0.05); padding: 10px;
+}
