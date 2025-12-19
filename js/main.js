@@ -125,6 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
             label_edu: "Education:", val_edu: "MSc Computer Science, Univ. of Leicester",
             label_focus: "Focus:", val_focus: "High-performance Backend, Cloud Architecture",
             label_curr: "Current:", val_curr: "Top-Tier Investment Bank",
+            profile_verified: "VERIFIED",
+            btn_id_card: "GENERATE ACCESS PASS",
 
             // [Experience - UPDATED]
             exp_role_1: "Lead Software Engineer",
@@ -198,6 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
             label_edu: "教育:", val_edu: "莱斯特大学 高级计算机科学硕士",
             label_focus: "专注:", val_focus: "高性能后端, 云原生架构",
             label_curr: "当前:", val_curr: "顶级投资银行",
+            profile_verified: "已认证",
+            btn_id_card: "生成访客通行证",
 
             // [Experience - UPDATED]
             // [修改点] 职位改为“资深”，描述改为风控相关
