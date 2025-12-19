@@ -577,30 +577,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 maintainAspectRatio: false, // 允许自适应容器高度
                 scales: {
                     r: {
-                        // 角度线 (放射线)
+                        // ★★★ 强制锁定刻度范围 0-100 ★★★
+                        min: 0,
+                        max: 100,
+
                         angleLines: {
                             color: 'rgba(0, 255, 242, 0.15)'
                         },
-                        // 网格线 (一圈圈的线)
                         grid: {
                             color: 'rgba(0, 255, 242, 0.15)',
-                            circular: true // 设置为圆形网格，更有科技感
+                            circular: true
                         },
-                        // 标签 (Backend Arch 等文字)
                         pointLabels: {
                             color: '#ccc',
-                            font: {
-                                family: font,
-                                size: 11,
-                                weight: 'bold'
-                            }
+                            font: { family: font, size: 11, weight: 'bold' }
                         },
-                        // 刻度 (0-100的数字，隐藏掉更简洁)
                         ticks: {
-                            display: false,
-                            beginAtZero: true,
-                            max: 100,
-                            stepSize: 20
+                            display: false, // 隐藏刻度数字
+                            stepSize: 20    // 保持网格密度
                         }
                     }
                 },
