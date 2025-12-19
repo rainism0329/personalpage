@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // [Titles]
             hero_intro: "// Hello World, I am",
-            hero_desc: "Crafting robust backend systems and navigating through complex architectures in the digital frontier.",
+            // 在 translations.en 中
+            hero_desc: "Standing at the event horizon of financial mega-structures, reversing entropy with architectural precision to forge absolute order from chaos; diving into the neural endings of dev-tools to recode the genetic sequence of programming itself. I exist in the quantum superposition of industrial robustness and radical art —— serving as both the alloy backbone of the capital matrix and the lightsaber piercing through mediocrity.",
             hero_btn: "View Profile",
 
             about_title: "System Status",
@@ -184,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // [Titles]
             hero_intro: "// 你好世界，我是",
-            hero_desc: "在数字前沿构建稳健的后端系统，驾驭复杂的架构设计。",
+            // 在 translations.zh 中
+            hero_desc: "伫立于金融巨构的事件视界，以精密架构逆转熵增，于数字混沌中重铸秩序；深潜至开发工具的神经中枢，重构编程的基因序列。游走于‘工业级稳健’与‘激进艺术’的量子叠加态 —— 既是支撑资本矩阵的合金脊梁，亦是斩破平庸的锋利光剑。",
             hero_btn: "查看档案",
 
             about_title: "系统状态 (SYSTEM_STATUS)",
