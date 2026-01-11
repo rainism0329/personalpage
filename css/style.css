@@ -1108,3 +1108,49 @@ body::after {
 h1, h2, h3, .nav-item {
     text-shadow: 0 0 5px currentColor;
 }
+
+/* =========================================
+   5. HOLOGRAPHIC CARD EFFECT (3D 悬浮卡片)
+   ========================================= */
+
+/* 1. 开启 3D 空间并优化性能 */
+.card, .avatar-box, .feature-card {
+    transform-style: preserve-3d;
+    will-change: transform; /* 告诉浏览器这个元素会动，提前优化 */
+    position: relative; /* 确保光泽层能绝对定位 */
+    overflow: hidden;   /* 即使旋转也不让光泽溢出边界 */
+}
+
+/* 2. 头像特殊处理：必须保持圆形 */
+.avatar-box {
+    border-radius: 50%;
+    /* 覆盖原有的 transition，交给 JS 控制以消除拖拽感 */
+    transition: none;
+}
+
+/* 3. 动态光泽层 (Glare) */
+.holo-glare {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; /* 让鼠标穿透，不阻挡点击 */
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    /* 关键：使用 overlay 混合模式，让光泽看起来像打在物体表面 */
+    mix-blend-mode: overlay;
+
+    /* 默认光泽：中心发散的白光 */
+    background: radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0) 80%
+    );
+}
+
+/* 4. 移除原本 CSS 的 hover transform，防止冲突 */
+/* 我们将完全通过 JS 接管 transform */
+.card:hover, .avatar-box:hover, .feature-card:hover {
+    transform: none !important;
+}
+/* 但保留原本的阴影和边框高亮效果 */

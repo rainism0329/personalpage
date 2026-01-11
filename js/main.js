@@ -896,4 +896,87 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. 启动引擎 (延迟1秒，等页面加载完)
         setTimeout(typeCode, 1000);
     }
+
+    // --- 14. 3D HOLOGRAPHIC EFFECT (全息悬浮卡片 - 完美版) ---
+    const holoCards = document.querySelectorAll('.card, .avatar-box, .feature-card');
+
+    if (holoCards.length > 0) {
+        holoCards.forEach(card => {
+            // 1. 动态注入光泽层 (如果还没有的话)
+            if (!card.querySelector('.holo-glare')) {
+                const glare = document.createElement('div');
+                glare.classList.add('holo-glare');
+                card.appendChild(glare);
+            }
+
+            const glare = card.querySelector('.holo-glare');
+
+            // 2. 鼠标进入：移除过渡，准备实时跟踪
+            card.addEventListener('mouseenter', () => {
+                // 瞬间响应，去除 CSS 的 transition 延迟
+                card.style.transition = 'none';
+                glare.style.opacity = '1';
+            });
+
+            // 3. 鼠标移动：计算 3D 旋转和光泽位置
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+
+                // 计算鼠标在卡片内的坐标
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // 计算中心点
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                // 计算旋转角度 (限制幅度在 ±8度，太夸张会晕)
+                // 鼠标在左，卡片向左倾斜 (RotateY 负值)
+                // 鼠标在上，卡片向上倾斜 (RotateX 正值)
+                const rotateX = ((y - centerY) / centerY) * -8;
+                const rotateY = ((x - centerX) / centerX) * 8;
+
+                // 应用 3D 变换
+                // perspective(1000px): 透视深度
+                // scale3d: 悬浮时稍微放大，增强层次感
+                // translateY: 稍微上浮
+                card.style.transform = `
+                    perspective(1000px)
+                    rotateX(${rotateX}deg)
+                    rotateY(${rotateY}deg)
+                    scale3d(1.02, 1.02, 1.02)
+                    translateY(-5px)
+                `;
+
+                // 计算光泽位置 (跟随鼠标反向移动，模拟真实光源反射)
+                // 当鼠标在右下角，反光应该出现在左上角
+                const glareX = 100 - (x / rect.width * 100);
+                const glareY = 100 - (y / rect.height * 100);
+
+                glare.style.background = `radial-gradient(
+                    circle at ${glareX}% ${glareY}%, 
+                    rgba(255, 255, 255, 0.3) 0%, 
+                    rgba(255, 255, 255, 0) 80%
+                )`;
+            });
+
+            // 4. 鼠标离开：平滑复位
+            card.addEventListener('mouseleave', () => {
+                // 加回过渡，让卡片缓慢回正，而不是瞬间跳回
+                card.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
+
+                // 重置所有变换
+                card.style.transform = `
+                    perspective(1000px)
+                    rotateX(0)
+                    rotateY(0)
+                    scale3d(1, 1, 1)
+                    translateY(0)
+                `;
+
+                // 隐藏光泽
+                glare.style.opacity = '0';
+            });
+        });
+    }
 });
