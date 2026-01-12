@@ -51,11 +51,23 @@ a, button, canvas, input, .hamburger, .nav-overlay, .fuel-widget, .fuel-btn, .au
 /* --- PRELOADER --- */
 #preloader {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 999999;
+    background: #000; z-index: 999999; /* 此时它的层级比 CRT 滤镜低，会被滤镜覆盖，效果正好 */
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    font-family: 'JetBrains Mono', monospace;
+
+    /* [修改] 强制使用系统自带等宽字体，无需下载，瞬间渲染，绝不跳动 */
+    font-family: 'Consolas', 'Monaco', 'Courier New', Courier, monospace !important;
 }
-.loader-text { color: var(--primary-color); margin-bottom: 20px; font-size: 1.2rem; text-shadow: 0 0 10px var(--primary-color); }
+
+/* 稍微调大一点字号，因为系统字体通常比 JetBrains Mono 小一点 */
+.loader-text {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.4rem; /* 原来是 1.2rem，稍微加大一点更有气势 */
+    text-shadow: 0 0 10px var(--primary-color);
+    font-weight: bold;
+    letter-spacing: 2px; /* 增加字间距，更有黑客感 */
+    text-transform: uppercase;
+}
 .loader-bar { width: 300px; height: 4px; background: #333; position: relative; overflow: hidden; }
 .loader-progress { width: 0%; height: 100%; background: var(--primary-color); box-shadow: 0 0 20px var(--primary-color); animation: loadProgress 2s ease-in-out forwards; }
 @keyframes loadProgress { 0% {width: 0%;} 40% {width: 30%;} 70% {width: 70%;} 100% {width: 100%;} }
