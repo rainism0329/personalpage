@@ -5,18 +5,37 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. PRELOADER 逻辑 ---
+    // --- 1. PRELOADER 逻辑 (带 2000ms 强制等待版) ---
+    const hidePreloader = () => {
+        const preloader = document.getElementById('preloader');
+        if (preloader && preloader.style.display !== 'none') {
+            preloader.style.transition = 'opacity 0.5s ease';
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                // 只有在 preloader 消失后，才允许 body 滚动
+                document.body.classList.remove('scroll-locked');
+            }, 500);
+        }
+    };
+
+// 场景 A: 资源加载完成 -> 强制展示 2秒 动画 -> 进入系统
     window.addEventListener('load', () => {
+        console.log(">> SYSTEM_READY: Resources loaded. Initiating boot sequence...");
         setTimeout(() => {
-            const preloader = document.getElementById('preloader');
-            if(preloader) {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                }, 500);
-            }
-        }, 2000);
+            hidePreloader();
+        }, 2000); // <--- 这里就是你要的 2秒 延迟
     });
+
+// 场景 B: 安全熔断机制
+// 既然要强制等 2秒，那兜底时间最好也延长一点 (5s -> 7s)
+// 这样即使网络稍慢，也不会因为熔断而突然打断你的开机动画
+    setTimeout(() => {
+        if (document.getElementById('preloader').style.display !== 'none') {
+            console.warn(">> SYSTEM_WARN: Loading timeout. Forcing boot sequence...");
+            hidePreloader();
+        }
+    }, 7000);
 
     // --- 2. 移动端导航 & 滚动锁定 ---
     const hamburger = document.querySelector('.hamburger');
@@ -979,4 +998,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // --- 15. LAZY LOAD STATISTICS (隐形加载统计脚本) ---
+    // 只有当页面完全就绪 3 秒后，才去请求不蒜子服务器
+    // 这样绝对不会卡住首屏加载和 Preloader
+    setTimeout(() => {
+        console.log(">> SYSTEM_INFO: Initializing background telemetry...");
+        const script = document.createElement('script');
+        script.src = "//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+        script.async = true;
+        // 遇到错误也不要报错，静默失败
+        script.onerror = () => {
+            console.warn(">> SYSTEM_WARN: Telemetry link severed (Busuanzi timeout).");
+            // 你甚至可以在这里回退到一个假的基数，让它停止跳动
+            // const fakeCount = "012345";
+            // animateDecryption(document.getElementById('cyber-counter'), fakeCount);
+        };
+        document.body.appendChild(script);
+    }, 3000);
 });
